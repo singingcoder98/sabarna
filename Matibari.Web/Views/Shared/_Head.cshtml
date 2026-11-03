@@ -1,0 +1,31 @@
+@{
+    /* Shared <head> content for every layout: SEO meta + Bootstrap + brand theme. */
+    var pageTitle = ViewData["Title"] as string
+        ?? "Matibari | Organic A2 Ghee, Raw Forest Honey & Achar";
+    var pageDescription = ViewData["Description"] as string
+        ?? "Buy 100% natural, certified organic A2 Bilona Desi Ghee, Raw Forest Honey, Aam ka Achaar and Bori from Matibari. Directly sourced from Indian farmers, plastic-free packing and fast pan-India delivery.";
+    var logoPath = ViewData["Logo"] as string ?? "/images/logo.png";
+}
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>@pageTitle</title>
+<meta name="description" content="@pageDescription" />
+<meta name="keywords" content="organic ghee, A2 bilona desi ghee, raw forest honey, mango pickle, aam ka achaar, bori, organic food India, Matibari" />
+<meta name="robots" content="index, follow" />
+<meta name="theme-color" content="#2f3e24" />
+<link rel="icon" type="image/png" href="@logoPath" />
+<link rel="apple-touch-icon" href="@logoPath" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Matibari" />
+<meta property="og:title" content="@pageTitle" />
+<meta property="og:description" content="@pageDescription" />
+<meta property="og:image" content="@logoPath" />
+<meta name="twitter:card" content="summary_large_image" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="~/lib/bootstrap/bootstrap.min.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />

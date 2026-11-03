@@ -1,4 +1,15 @@
-node_modules/
-dist/
+# .NET build output
+bin/
+obj/
+*.user
+
+# Local database (SQLite — recreated and re-seeded on first run)
+*.db
+*.db-shm
+*.db-wal
+
+# IDE / OS
+.vs/
+.idea/
 .DS_Store
 *.local

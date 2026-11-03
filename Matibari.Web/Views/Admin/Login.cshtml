@@ -4,63 +4,67 @@
     Layout = null;
 }
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-IN" data-bs-theme="light">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"]</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <partial name="_Head" />
 </head>
 <body>
-    <div class="login-wrap">
-        <section class="login-hero">
-            <a href="/" class="brand brand-light">
-                <img src="/images/logo.png" alt="Matibari logo" class="brand-logo" />
-                <span>
-                    <strong>Matibari</strong>
-                    <small style="color:rgba(233,196,106,.85)">Admin workspace</small>
+    <div class="mb-auth">
+        <section class="mb-auth-hero">
+            <a href="/" class="d-inline-flex align-items-center gap-2 text-decoration-none">
+                <img src="/images/logo.png" alt="Matibari logo" class="mb-brand-logo" width="44" height="44" />
+                <span class="d-flex flex-column">
+                    <strong class="mb-footer-brand">Matibari</strong>
+                    <small class="mb-admin-muted">Admin workspace</small>
                 </span>
             </a>
+
             <div>
-                <span class="hero-badge">🛡️ Two-step admin access</span>
-                <h1 style="margin-top:1.35rem">Good food.<br /><span>Good business.</span></h1>
-                <p class="muted-light" style="max-width:26rem">
+                <span class="mb-hero-badge">🛡️ Two-step admin access</span>
+                <h1 class="mt-3">Good food.<span>Good business.</span></h1>
+                <p>
                     Password plus a one-time code keeps your store data — orders, sales and
                     customers — safe behind two locks.
                 </p>
             </div>
-            <p style="color:rgba(244,237,216,.45);font-size:.78rem">Handcrafted | Natural | Traditional</p>
+
+            <p class="mb-0" style="color:rgba(244,237,216,.45);font-size:.78rem">
+                Handcrafted | Natural | Traditional
+            </p>
         </section>
 
-        <section class="login-form">
-            <div class="login-card">
-                <a href="/" class="btn btn-ghost btn-sm" style="margin-bottom:2rem">← Back to store</a>
-                <span class="kicker">Welcome back</span>
-                <h2 style="font-size:2.15rem;color:var(--green-800);margin-top:.55rem">Admin sign in</h2>
-                <p class="muted" style="font-size:.88rem">Step 1 of 2 · Enter your admin credentials.</p>
+        <section class="mb-auth-form">
+            <div class="mb-auth-card">
+                <a href="/" class="btn btn-ghost btn-sm mb-4">← Back to store</a>
 
-                <form asp-action="Login" method="post" style="margin-top:1.85rem">
+                <span class="mb-kicker">Welcome back</span>
+                <h2 class="mb-title" style="font-size:2rem">Admin sign in</h2>
+                <p class="text-secondary" style="font-size:.88rem">Step 1 of 2 · Enter your admin credentials.</p>
+
+                <form asp-action="Login" method="post" class="mt-4">
                     @Html.AntiForgeryToken()
-                    <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+                    <div asp-validation-summary="ModelOnly" class="mb-validation"></div>
 
-                    <label class="field">
-                        <span>Admin email</span>
-                        <input asp-for="Email" type="email" placeholder="you@@matibari.in" required autofocus />
-                    </label>
-                    <label class="field">
-                        <span>Password</span>
-                        <input asp-for="Password" type="password" placeholder="Enter your password" required />
-                    </label>
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label">Admin email</label>
+                        <input asp-for="Email" type="email" class="form-control" placeholder="you@matibari.in"
+                               autocomplete="username" required autofocus />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
 
-                    <button class="btn btn-primary" type="submit" style="width:100%">Continue with OTP →</button>
+                    <div class="mb-4">
+                        <label asp-for="Password" class="form-label">Password</label>
+                        <input asp-for="Password" type="password" class="form-control"
+                               placeholder="Enter your password" autocomplete="current-password" required />
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+
+                    <button class="btn btn-brand w-100" type="submit">Continue with OTP →</button>
                 </form>
 
-                <div style="margin-top:2rem;background:var(--cream-2);border:1px solid rgba(233,196,106,.5);border-radius:1rem;padding:1.15rem">
-                    <strong style="font-size:.78rem">Preview environment</strong>
-                    <p class="muted" style="font-size:.72rem;margin:.45rem 0 0">
+                <div class="mb-demo-note mt-4">
+                    <strong>Preview environment</strong>
+                    <p class="mb-0 mt-1">
                         Demo login: <b>saptarsree.b@@skykingindia.com</b> / <b>@@Saptarsee1998</b>.
                         The OTP is shown on screen in preview. Connect an email/SMS provider before production.
                     </p>
@@ -68,5 +72,7 @@
             </div>
         </section>
     </div>
+
+    <partial name="_Scripts" />
 </body>
 </html>

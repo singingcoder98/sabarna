@@ -4,143 +4,207 @@
     Layout = "_AdminLayout";
 }
 
-<div class="admin-header">
+<div class="mb-page-head">
     <div>
         <h1>Products</h1>
-        <p class="muted" style="font-size:.85rem;margin:.35rem 0 0">
-            @Model.Count(p => p.Active) live · @Model.Count total — changes appear on the website instantly.
-        </p>
+        <p>@Model.Count(p => p.Active) live · @Model.Count total — changes appear on the website instantly.</p>
     </div>
-    <span class="pill pill-green">Combo products show in "Special Combos"</span>
+    <span class="mb-pill mb-pill-green">Combo products show in “Special combos”</span>
 </div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Product</th>
-            <th>Category</th>
-            <th>Price</th>
-            <th>Stock</th>
-            <th>Type</th>
-            <th>Visible</th>
-            <th style="text-align:right">Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var product in Model)
-        {
-            <tr>
-                <td>
-                    <div style="display:flex;align-items:center;gap:.85rem">
-                        @if (product.HasImage)
-                        {
-                            <img src="@product.Image" alt="" style="width:2.75rem;height:2.75rem;border-radius:.75rem;object-fit:cover" />
-                        }
-                        else
-                        {
-                            <div style="width:2.75rem;height:2.75rem;border-radius:.75rem;background:linear-gradient(135deg,#f7efdc,#e3cfa4)"></div>
-                        }
-                        <div>
-                            <strong>@product.Name</strong><br />
-                            <small class="muted">@product.Unit</small>
-                        </div>
-                    </div>
-                </td>
-                <td>@product.Category</td>
-                <td>
-                    <strong>₹@product.Price</strong>
-                    @if (product.Mrp > product.Price)
-                    {
-                        <br />
-                        <small class="muted" style="text-decoration:line-through">₹@product.Mrp</small>
-                    }
-                </td>
-                <td>
-                    @if (product.Stock < 20)
-                    {
-                        <span class="pill pill-red">@product.Stock units</span>
-                    }
-                    else
-                    {
-                        <span class="pill pill-green">@product.Stock units</span>
-                    }
-                </td>
-                <td>
-                    @if (product.IsCombo)
-                    {
-                        <span class="pill pill-amber">@(product.Featured ? "Featured Combo" : "Combo")</span>
-                    }
-                    else
-                    {
-                        <span class="pill pill-grey">Individual</span>
-                    }
-                </td>
-                <td>
-                    <form asp-action="ToggleProduct" method="post" style="display:inline">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="id" value="@product.Id" />
-                        <button class="btn btn-sm @(product.Active ? "btn-dark" : "btn-ghost")" type="submit">
-                            @(product.Active ? "Live" : "Hidden")
-                        </button>
-                    </form>
-                </td>
-                <td style="text-align:right">
-                    <details style="display:inline-block;text-align:left">
-                        <summary class="btn btn-ghost btn-sm" style="cursor:pointer;list-style:none">Edit</summary>
-                        <div class="panel" style="position:absolute;right:1rem;z-index:20;width:min(30rem,92vw);margin-top:.55rem">
-                            <form asp-action="SaveProduct" method="post">
+@if (Model.Count == 0)
+{
+    <div class="mb-panel text-center">
+        <p class="text-secondary mb-0">No products yet. Seed data is created on first run.</p>
+    </div>
+}
+else
+{
+    <div class="mb-table-card table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th scope="col">Product</th>
+                    <th scope="col">Category</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Stock</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Visible</th>
+                    <th scope="col" class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var product in Model)
+                {
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                @if (product.HasImage)
+                                {
+                                    <img src="@product.Image" alt="" class="mb-product-thumb" />
+                                }
+                                else
+                                {
+                                    <div class="mb-product-thumb"></div>
+                                }
+                                <div>
+                                    <strong>@product.Name</strong><br />
+                                    <small class="text-secondary">@product.Unit</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>@product.Category</td>
+                        <td>
+                            <strong>₹@product.Price</strong>
+                            @if (product.Mrp > product.Price)
+                            {
+                                <br />
+                                <small class="text-secondary text-decoration-line-through">₹@product.Mrp</small>
+                            }
+                        </td>
+                        <td>
+                            <span class="mb-pill @(product.Stock < 20 ? "mb-pill-red" : "mb-pill-green")">
+                                @product.Stock units
+                            </span>
+                        </td>
+                        <td>
+                            @if (product.IsCombo)
+                            {
+                                <span class="mb-pill mb-pill-amber">@(product.Featured ? "Featured combo" : "Combo")</span>
+                            }
+                            else
+                            {
+                                <span class="mb-pill mb-pill-grey">Individual</span>
+                            }
+                        </td>
+                        <td>
+                            <form asp-action="ToggleProduct" method="post" class="d-inline">
                                 @Html.AntiForgeryToken()
-                                <input type="hidden" name="Id" value="@product.Id" />
-
-                                <label class="field"><span>Name</span><input name="Name" value="@product.Name" required /></label>
-                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:.85rem">
-                                    <label class="field"><span>Category</span><input name="Category" value="@product.Category" /></label>
-                                    <label class="field"><span>Pack size</span><input name="Unit" value="@product.Unit" /></label>
-                                    <label class="field"><span>Price (₹)</span><input name="Price" type="number" step="0.01" value="@product.Price" /></label>
-                                    <label class="field"><span>MRP (₹)</span><input name="Mrp" type="number" step="0.01" value="@product.Mrp" /></label>
-                                    <label class="field"><span>Stock</span><input name="Stock" type="number" value="@product.Stock" /></label>
-                                    <label class="field"><span>Badge</span><input name="Tag" value="@product.Tag" /></label>
-                                </div>
-                                <label class="field"><span>Image URL</span><input name="Image" value="@product.Image" placeholder="/images/product-x.jpg" /></label>
-                                <label class="field"><span>Description</span><textarea name="Description" rows="3">@product.Description</textarea></label>
-
-                                <div style="display:flex;gap:1.15rem;margin:.85rem 0;flex-wrap:wrap">
-                                    <label style="display:flex;align-items:center;gap:.45rem;font-size:.8rem">
-                                        <input type="hidden" name="Active" value="false" />
-                                        <input type="checkbox" name="Active" value="true" @(product.Active ? "checked" : "") /> Show in shop
-                                    </label>
-                                    <label style="display:flex;align-items:center;gap:.45rem;font-size:.8rem">
-                                        <input type="hidden" name="IsCombo" value="false" />
-                                        <input type="checkbox" name="IsCombo" value="true" @(product.IsCombo ? "checked" : "") /> Combo / bundle
-                                    </label>
-                                    <label style="display:flex;align-items:center;gap:.45rem;font-size:.8rem">
-                                        <input type="hidden" name="Featured" value="false" />
-                                        <input type="checkbox" name="Featured" value="true" @(product.Featured ? "checked" : "") /> Featured combo
-                                    </label>
-                                </div>
-
-                                <label class="field">
-                                    <span>Combo items (JSON)</span>
-                                    <textarea name="ComboItemsJson" rows="3">@product.ComboItemsJson</textarea>
-                                    <small>Format: [{"name":"Tok-Jhal Achar","qty":1,"image":"/images/product-pickle.jpg"}]</small>
-                                </label>
-
-                                <button class="btn btn-primary btn-sm" type="submit">Save changes</button>
+                                <input type="hidden" name="id" value="@product.Id" />
+                                <button class="btn btn-sm @(product.Active ? "btn-brand" : "btn-ghost")" type="submit">
+                                    @(product.Active ? "Live" : "Hidden")
+                                </button>
                             </form>
-                        </div>
-                    </details>
+                        </td>
+                        <td class="text-end">
+                            <button class="btn btn-ghost btn-sm" type="button"
+                                    data-bs-toggle="modal" data-bs-target="#editProduct@(product.Id)">
+                                Edit
+                            </button>
 
-                    <form asp-action="DeleteProduct" method="post" style="display:inline"
-                          onsubmit="return confirm('Delete this product permanently?');">
+                            <form asp-action="DeleteProduct" method="post" class="d-inline"
+                                  onsubmit="return confirm('Delete this product permanently?');">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@product.Id" />
+                                <button class="btn btn-sm mb-btn-danger" type="submit">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @* One Bootstrap modal per product, kept outside the table so the backdrop behaves. *@
+    @foreach (var product in Model)
+    {
+        <div class="modal fade" id="editProduct@(product.Id)" tabindex="-1"
+             aria-labelledby="editProductLabel@(product.Id)" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                <div class="modal-content">
+                    <form asp-action="SaveProduct" method="post">
                         @Html.AntiForgeryToken()
-                        <input type="hidden" name="id" value="@product.Id" />
-                        <button class="btn btn-sm" type="submit"
-                                style="background:#fdeeea;color:#b8543c">
-                            Delete
-                        </button>
+                        <input type="hidden" name="Id" value="@product.Id" />
+
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editProductLabel@(product.Id)">Edit — @product.Name</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+
+                        <div class="modal-body">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label" for="name@(product.Id)">Name</label>
+                                    <input id="name@(product.Id)" class="form-control" name="Name" value="@product.Name" required />
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label" for="cat@(product.Id)">Category</label>
+                                    <input id="cat@(product.Id)" class="form-control" name="Category" value="@product.Category" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="unit@(product.Id)">Pack size</label>
+                                    <input id="unit@(product.Id)" class="form-control" name="Unit" value="@product.Unit" />
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label" for="price@(product.Id)">Price (₹)</label>
+                                    <input id="price@(product.Id)" class="form-control" name="Price" type="number" step="0.01" value="@product.Price" />
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label" for="mrp@(product.Id)">MRP (₹)</label>
+                                    <input id="mrp@(product.Id)" class="form-control" name="Mrp" type="number" step="0.01" value="@product.Mrp" />
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label" for="stock@(product.Id)">Stock</label>
+                                    <input id="stock@(product.Id)" class="form-control" name="Stock" type="number" value="@product.Stock" />
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label" for="tag@(product.Id)">Badge</label>
+                                    <input id="tag@(product.Id)" class="form-control" name="Tag" value="@product.Tag" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="image@(product.Id)">Image URL</label>
+                                    <input id="image@(product.Id)" class="form-control" name="Image" value="@product.Image"
+                                           placeholder="/images/product-x.jpg" />
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label" for="desc@(product.Id)">Description</label>
+                                    <textarea id="desc@(product.Id)" class="form-control" name="Description" rows="3">@product.Description</textarea>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="d-flex flex-wrap gap-4">
+                                        <div class="form-check">
+                                            <input type="hidden" name="Active" value="false" />
+                                            <input class="form-check-input" type="checkbox" name="Active" value="true"
+                                                   id="active@(product.Id)" @(product.Active ? "checked" : null) />
+                                            <label class="form-check-label" for="active@(product.Id)">Show in shop</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input type="hidden" name="IsCombo" value="false" />
+                                            <input class="form-check-input" type="checkbox" name="IsCombo" value="true"
+                                                   id="combo@(product.Id)" @(product.IsCombo ? "checked" : null) />
+                                            <label class="form-check-label" for="combo@(product.Id)">Combo / bundle</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input type="hidden" name="Featured" value="false" />
+                                            <input class="form-check-input" type="checkbox" name="Featured" value="true"
+                                                   id="featured@(product.Id)" @(product.Featured ? "checked" : null) />
+                                            <label class="form-check-label" for="featured@(product.Id)">Featured combo</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label" for="comboItems@(product.Id)">Combo items (JSON)</label>
+                                    <textarea id="comboItems@(product.Id)" class="form-control" name="ComboItemsJson" rows="3">@product.ComboItemsJson</textarea>
+                                    <div class="form-text">
+                                        Format: [{"name":"Tok-Jhal Achar","qty":1,"image":"/images/product-pickle.jpg"}]
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-brand">Save changes</button>
+                        </div>
                     </form>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+                </div>
+            </div>
+        </div>
+    }
+}

@@ -4,69 +4,112 @@
     Layout = "_AdminLayout";
 }
 
-<div class="admin-header">
+<div class="mb-page-head">
     <div>
         <h1>Store settings</h1>
-        <p class="muted" style="font-size:.85rem;margin:.35rem 0 0">
-            Every field saves to the database and updates the live website.
-        </p>
+        <p>Every field saves to the database and updates the live website.</p>
     </div>
 </div>
 
-<form asp-action="Settings" method="post" class="grid grid-2" style="align-items:start">
+<form asp-action="Settings" method="post" class="row g-4 align-items-start">
     @Html.AntiForgeryToken()
 
-    <div class="panel">
-        <h3>Brand identity</h3>
-        <label class="field"><span>Brand name</span><input asp-for="BrandName" /></label>
-        <label class="field"><span>Tagline</span><input asp-for="Tagline" /></label>
-        <label class="field">
-            <span>Logo path / URL</span>
-            <input asp-for="Logo" placeholder="/images/logo.png" />
-            <small>Upload your logo to wwwroot/images/ and give the path here.</small>
-        </label>
-    </div>
+    <div class="col-lg-8">
+        <div class="row g-4">
+            <div class="col-12">
+                <div class="mb-panel">
+                    <h3 class="h6 mb-3">Brand identity</h3>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="BrandName" class="form-label">Brand name</label>
+                            <input asp-for="BrandName" class="form-control" />
+                            <span asp-validation-for="BrandName" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Tagline" class="form-label">Tagline</label>
+                            <input asp-for="Tagline" class="form-control" />
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Logo" class="form-label">Logo path / URL</label>
+                            <input asp-for="Logo" class="form-control" placeholder="/images/logo.png" />
+                            <div class="form-text">Upload your logo to wwwroot/images/ and enter the path here.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    <div class="panel">
-        <h3>Hero banner</h3>
-        <label class="field"><span>Top label</span><input asp-for="HeroKicker" /></label>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.85rem">
-            <label class="field"><span>Headline (line 1)</span><input asp-for="HeroTitle1" /></label>
-            <label class="field"><span>Headline (line 2, highlighted)</span><input asp-for="HeroTitle2" /></label>
+            <div class="col-12">
+                <div class="mb-panel">
+                    <h3 class="h6 mb-3">Hero banner</h3>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label asp-for="HeroKicker" class="form-label">Top label</label>
+                            <input asp-for="HeroKicker" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="HeroTitle1" class="form-label">Headline (line 1)</label>
+                            <input asp-for="HeroTitle1" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="HeroTitle2" class="form-label">Headline (line 2, highlighted)</label>
+                            <input asp-for="HeroTitle2" class="form-control" />
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="HeroText" class="form-label">Intro text</label>
+                            <textarea asp-for="HeroText" class="form-control" rows="4"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="mb-panel">
+                    <h3 class="h6 mb-3">Contact &amp; WhatsApp</h3>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="Email" class="form-label">Email</label>
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Phone" class="form-label">Phone</label>
+                            <input asp-for="Phone" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Whatsapp" class="form-label">WhatsApp number</label>
+                            <input asp-for="Whatsapp" class="form-control" placeholder="919876543210" />
+                            <div class="form-text">Country code included, digits only. For India: 91 + 10-digit number.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Address" class="form-label">Address</label>
+                            <textarea asp-for="Address" class="form-control" rows="2"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <label class="field"><span>Intro text</span><textarea asp-for="HeroText" rows="4"></textarea></label>
     </div>
 
-    <div class="panel">
-        <h3>Contact &amp; WhatsApp</h3>
-        <label class="field"><span>Email</span><input asp-for="Email" /></label>
-        <label class="field"><span>Phone</span><input asp-for="Phone" /></label>
-        <label class="field">
-            <span>WhatsApp number (for the chat button)</span>
-            <input asp-for="Whatsapp" placeholder="919876543210" />
-            <small>Country code ke saath, sirf digits. India ke liye 91 + 10 digit number.</small>
-        </label>
-        <label class="field"><span>Address</span><textarea asp-for="Address" rows="3"></textarea></label>
-    </div>
+    <div class="col-lg-4">
+        <div class="mb-panel">
+            <h3 class="h6 mb-3">How this works</h3>
 
-    <div class="panel">
-        <h3>How this works</h3>
-        <div style="display:grid;gap:.85rem;font-size:.82rem;color:var(--muted)">
-            <div style="background:#f4f7f2;border-radius:.85rem;padding:1rem">
-                <b style="color:#3c5140">Database connected:</b> your changes are saved to the
-                local SQLite database (<code>matibari.db</code>) and shown to every visitor.
+            <div class="d-grid gap-3" style="font-size:.82rem;color:var(--mb-muted)">
+                <div style="background:#f4f7f2;border-radius:.85rem;padding:1rem">
+                    <strong style="color:#3c5140">Database connected:</strong> your changes are saved to the
+                    SQLite database (<code>matibari.db</code>) and shown to every visitor.
+                </div>
+                <div style="background:#f8f3e4;border-radius:.85rem;padding:1rem">
+                    <strong style="color:#7c6a41">Going bigger:</strong> switch <code>appsettings.json</code>
+                    to SQL Server / PostgreSQL — the same code keeps working.
+                </div>
+                <div style="background:#eef4ec;border-radius:.85rem;padding:1rem">
+                    <strong style="color:#3c5140">Payments:</strong> Razorpay keys go in
+                    <code>appsettings.json</code> when you integrate the gateway.
+                </div>
             </div>
-            <div style="background:#f8f3e4;border-radius:.85rem;padding:1rem">
-                <b style="color:#7c6a41">Going bigger:</b> switch <code>appsettings.json</code>
-                to SQL Server / PostgreSQL / Supabase — the same code keeps working.
-            </div>
-            <div style="background:#eef4ec;border-radius:.85rem;padding:1rem">
-                <b style="color:#3c5140">Payments:</b> Razorpay keys go in
-                <code>appsettings.json</code> when you integrate the gateway.
-            </div>
+
+            <button class="btn btn-brand w-100 mt-4" type="submit">💾 Save all changes</button>
         </div>
-        <button class="btn btn-primary" type="submit" style="width:100%;margin-top:1.35rem">
-            💾 Save all changes
-        </button>
     </div>
 </form>

@@ -1,55 +1,76 @@
 @using Matibari.Web.Data
+@using Matibari.Web.Models
 @inject AppDbContext Db
 @{
-    var setting = Db.SiteSettings.FirstOrDefault() ?? new Matibari.Web.Models.SiteSetting();
-    var current = ViewContext.RouteData.Values["action"]?.ToString();
-    string Active(string action) => current == action ? "nav-item active" : "nav-item";
+    var setting = Db.SiteSettings.FirstOrDefault() ?? new SiteSetting();
+    ViewData["Logo"] = setting.Logo;
+    ViewData["Title"] ??= $"Admin | {setting.BrandName}";
 }
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-IN" data-bs-theme="light">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"]</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <partial name="_Head" />
 </head>
-<body>
-    <div class="admin-wrap">
-        <aside class="admin-side">
-            <a href="/Admin/Dashboard" class="brand brand-light" style="margin-bottom:1.75rem">
-                <img src="@setting.Logo" alt="@setting.BrandName logo" class="brand-logo" />
-                <span>
-                    <strong style="font-size:1.05rem">@setting.BrandName</strong>
-                    <small style="color:rgba(233,196,106,.75)">Store admin</small>
-                </span>
-            </a>
-
-            <p style="font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.35);padding-left:1.15rem">Workspace</p>
-            <a class="@Active("Dashboard")" href="/Admin/Dashboard">📊 Overview</a>
-            <a class="@Active("Orders")" href="/Admin/Orders">📋 Orders</a>
-            <a class="@Active("Products")" href="/Admin/Products">📦 Products</a>
-            <a class="@Active("Settings")" href="/Admin/Settings">⚙️ Store settings</a>
-
-            <p style="font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.35);padding-left:1.15rem;margin-top:1.35rem">Store</p>
-            <a class="nav-item" href="/" target="_blank">🛍️ View storefront →</a>
-
-            <div style="margin-top:auto">
-                <div class="pay-note" style="margin-bottom:1rem">
-                    <b style="color:var(--gold)">🔐 Admin workspace</b><br />
-                    Signed in as @User.Identity?.Name
-                </div>
-                <a class="nav-item" href="/Admin/Logout">🚪 Sign out</a>
-            </div>
+<body class="mb-admin">
+    <div class="d-flex min-vh-100">
+        @* Fixed sidebar on large screens *@
+        <aside class="mb-admin-side d-none d-lg-flex flex-column d-print-none">
+            <partial name="_AdminNav" />
         </aside>
 
-        <main class="admin-main">
-            @if (TempData["Toast"] is string toast)
-            {
-                <div class="toast">@toast</div>
-            }
-            @RenderBody()
-        </main>
+        <div class="flex-grow-1 d-flex flex-column mb-admin-content">
+            <nav class="navbar mb-admin-topbar sticky-top px-3 px-lg-4">
+                <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="offcanvas"
+                        data-bs-target="#adminMenu" aria-controls="adminMenu" aria-label="Open admin menu">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <span class="navbar-text ms-auto small mb-admin-topdate">
+                    @DateTime.Now.ToString("ddd, dd MMM yyyy")
+                </span>
+            </nav>
+
+            <div class="p-3 p-lg-4 flex-grow-1">
+                @RenderBody()
+            </div>
+        </div>
     </div>
+
+    @* Slide-out menu for phones and tablets *@
+    <div class="offcanvas offcanvas-start mb-admin-side" tabindex="-1" id="adminMenu" aria-labelledby="adminMenuLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title mb-admin-brand" id="adminMenuLabel">Menu</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body d-flex flex-column">
+            <partial name="_AdminNav" />
+        </div>
+    </div>
+
+    @if (TempData["Toast"] is string toastMessage)
+    {
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+            <div class="toast align-items-center mb-toast" role="status" aria-live="polite" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">✅ @toastMessage</div>
+                    <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (TempData["Error"] is string errorMessage)
+    {
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+            <div class="toast align-items-center mb-toast mb-toast-error" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">⚠️ @errorMessage</div>
+                    <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+    }
+
+    <partial name="_Scripts" />
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

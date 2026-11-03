@@ -1,113 +1,142 @@
-# Matibari
+# Matibari — Organic Foods Storefront (.NET 8 · ASP.NET Core MVC · Razor · Bootstrap 5)
 
-A responsive organic foods storefront for a fictional Indian brand, built with React, TypeScript, Vite, and Tailwind CSS v4.
+A complete, responsive organic-foods storefront for an Indian brand, built as a **pure ASP.NET Core
+MVC application** — Razor views, Bootstrap 5 for layout, Entity Framework Core with SQLite for
+storage, and a two-step (password + OTP) admin panel.
 
-## Requirements
+No JavaScript framework, no Node.js, no build step. Clone → `dotnet run`.
 
-- Node.js 20.19+ or 22.12+
-- npm
+---
 
-## Get started
+## 1. Requirements
+
+| Tool | Version |
+|---|---|
+| [.NET SDK](https://dotnet.microsoft.com/download/dotnet/8.0) | 8.0 or newer |
+| Any editor | VS Code, Visual Studio, Rider |
+
+> SQLite is bundled with EF Core — there is **no database server to install**.
+> The database file (`matibari.db`) is created and seeded automatically on first run.
+
+---
+
+## 2. Run it
 
 ```bash
-npm install
-npm run dev
+# from the repository root
+cd Matibari.Web
+dotnet restore
+dotnet run
 ```
 
-Vite prints a local URL in the terminal. Open it in a browser to preview the website.
+Then open **http://localhost:5080** — the port is pinned in `Matibari.Web/Properties/launchSettings.json`.
 
-## Available scripts
+To choose a port explicitly:
 
-- `npm run dev` starts the local development server.
-- `npm run build` creates the production build in `dist/`.
-- `npm run preview` serves the production build locally.
-
-## Project structure
-
-```text
-src/
-  App.tsx                   Page composition
-  components/               Navigation, sections, cart drawer, and footer
-  components/admin/         Admin sign-in and dashboard screens
-  context/CartContext.tsx   Shopping cart state and actions
-  data/adminData.ts         Sample admin dashboard data
-  data/products.ts          Product catalogue
-  index.css                 Tailwind, fonts, and global styles
-  main.tsx                  React entry point
-public/images/              Brand and product photography
-index.html                  Page metadata and HTML entry point
+```bash
+dotnet run --urls "http://localhost:5080"
 ```
 
-## Editing the store without touching code
+### Where things live after a build
 
-Sign in at `/#/admin` and use the two new tabs — everything below changes the live website instantly:
+| Path | What it is |
+|---|---|
+| `Matibari.Web/` | The MVC web application |
+| `Matibari.Web/Controllers/` | `Home`, `Shop`, `Cart`, `Admin` |
+| `Matibari.Web/Models/` | EF Core entities + view models |
+| `Matibari.Web/Views/` | Razor `.cshtml` pages |
+| `Matibari.Web/Data/` | `AppDbContext` and first-run seeding |
+| `Matibari.Web/wwwroot/` | `css/site.css`, `images/`, `lib/bootstrap/` |
+| `matibari.db` | SQLite database (created on first run, git-ignored) |
 
-- **Products** (`Products` tab) — add, edit or delete products; change name, price, MRP, pack
-  size, stock, badge, description and photo (upload a file or paste an image URL); toggle
-  whether a product is *Live* or *Hidden* in the shop.
-- **Store settings** (`Store settings` tab) — change the brand name, logo, tagline, hero
-  headline/text and contact details. The browser tab title and favicon update automatically.
+---
 
-Currently the shop shows 3 products — A2 Bilona Desi Ghee, Raw Forest Honey and Aam ka Achaar.
-The other demo products (turmeric, rice, spice box, oil) are kept in the catalogue as *Hidden*
-and can be switched live at any time from the Products tab.
+## 3. Admin panel
 
-### Where the data lives
+| URL | Step |
+|---|---|
+| `/Admin/Login` | Email + password |
+| `/Admin/VerifyOtp` | 6-digit one-time code |
 
-Changes are stored in the browser (`localStorage`, key `matibari-site-v1`), so they survive a
-refresh but are per-device — perfect for previewing. To make edits visible to every visitor,
-keep the same UI and swap the storage in `src/context/SiteContext.tsx` for API calls to your
-database (Supabase or Firebase is the quickest option). The shape of the data is already
-defined in `src/data/products.ts` (`Product` and `SiteSettings`), which maps 1:1 to database
-tables. `Reset to defaults` in the admin tabs restores the seed catalogue.
+**Seeded credentials**
 
-- Replace the image files in `public/images/` to use your own photography, or upload photos
-  directly from the Products / Store settings tabs.
-- Page layout and sections live in `src/App.tsx` and `src/components/`.
+```
+Email:    saptarsree.b@skykingindia.com
+Password: @Saptarsee1998
+```
 
-The cart and product category filters work in the browser. Checkout, search, newsletter persistence, and social links are front-end placeholders and need a backend or third-party service before production use.
+In preview mode the OTP is printed on the verification screen (and in `TempData`). For production,
+send it through an SMS/email provider (MSG91, Twilio, etc.) and never return it to the browser.
 
-## Admin preview
+Admin sections: **Overview** (revenue, orders, low stock), **Orders** (status pipeline
+Processing → Packed → Shipped → Delivered), **Products** (create/edit/hide/delete, combo builder),
+**Store settings** (brand, hero copy, contact, WhatsApp number).
 
-Open `/#/admin` to see the two-step admin sign-in and sample dashboard.
+---
 
-- Admin email: `saptarsree.b@skykingindia.com`
-- Admin password: `@Saptarsee1998`
-- To allow more admins later, add one line each to the `ADMINS` list in
-  `src/components/admin/AdminLogin.tsx` (and one row each in `public.admin_users`).
-- Demo OTP: shown on screen in preview mode
+## 4. Storefront features
 
-The sign-in has two steps: email + password, then a 6-digit one-time code (OTP). In this
-front-end preview the OTP is generated and checked in the browser so you can see the whole
-flow. That is demo behaviour, not security.
+- Dark-green hero with editable kicker/headline/body, scrolling trust strip
+- Product grid with tags, ratings, strike-through MRP and stock-aware "Add to cart"
+- **Special Combos** section: featured bundle, "what's inside" chips, savings badge
+- Session-based basket: add / update quantity / remove, no login needed
+- One-page checkout with server-side validation — **online payment only (no COD)**
+- Policies page (shipping, refunds, privacy, terms) as a Bootstrap accordion
+- WhatsApp floating button driven by the admin-configured number
+- SEO: per-page titles/descriptions, Open Graph tags, JSON-LD `OnlineStore` schema
 
-### Making the OTP login real
+---
 
-A real OTP cannot be issued or checked safely in the browser — you need a small backend
-plus a database. The UI already calls two functions in `src/services/authService.ts`
-(`requestAdminOtp`, `verifyAdminOtp`); replace their bodies with fetch calls to your server.
+## 5. How Bootstrap is wired in
 
-Suggested stack (any one works):
+Bootstrap **5.3.3** is vendored locally — no CDN, works offline:
 
-- **Fastest:** Supabase — Postgres database + Auth with email/SMS OTP, generous free tier.
-- **Google:** Firebase Auth (Phone/Email OTP) + Firestore.
-- **Own server:** Node/Express or Next.js API routes + Postgres/MySQL + an OTP provider
-  (MSG91 or Twilio for SMS in India, SendGrid/Resend for email).
+```
+Matibari.Web/wwwroot/lib/bootstrap/bootstrap.min.css
+Matibari.Web/wwwroot/lib/bootstrap/bootstrap.bundle.min.js
+```
 
-Flow to implement on the server:
+Layout comes from Bootstrap (container, row/col, navbar, card, modal, accordion, offcanvas,
+utilities). All Matibari branding — palette, fonts, buttons, cards, marquee, combo panels — lives in
+`wwwroot/css/site.css`, which only layers on top of Bootstrap CSS custom properties.
 
-1. `POST /api/auth/admin/login` — verify email + password against a `admin_users` table
-   (store only a bcrypt/argon2 hash). Then create an OTP: generate 6 digits, store a hash
-   of the code with a 5-minute expiry and an attempt counter, and send it via MSG91/Twilio.
-2. `POST /api/auth/admin/verify-otp` — compare the submitted code against the hash, allow a
-   maximum of 5 attempts, then issue an httpOnly JWT session cookie with `role: "admin"`.
-3. `POST /api/auth/admin/resend-otp` — rate-limit (e.g. max 3 per 10 minutes per account).
-4. Every dashboard API (`/api/admin/orders`, `/api/admin/revenue`, …) must check the session
-   role server-side and return data from the database. Never ship sales or order data to the
-   front end before authentication.
+Every page loads `Views/Shared/_Head.cshtml` (meta + CSS) and `Views/Shared/_Scripts.cshtml`
+(Bootstrap JS + toast/reveal behaviour), so there is one place to change anything global.
 
-Minimum database tables: `admin_users (id, email, password_hash, role, phone)`,
-`otp_challenges (id, admin_id, code_hash, expires_at, attempts)`, `orders`, `products`,
-`inventory`. Then replace the sample arrays in `src/data/adminData.ts` with API responses.
+---
 
-Until that backend exists, the dashboard metrics, inventory and orders remain example data.
+## 6. Configuration
+
+`Matibari.Web/appsettings.json`
+
+```json
+{
+  "ConnectionStrings": {
+    "Default": "Data Source=matibari.db"
+  }
+}
+```
+
+Switch to SQL Server / PostgreSQL by changing the connection string **and** the provider in
+`Program.cs` (`options.UseSqlite(...)` → `options.UseSqlServer(...)` etc.).
+
+---
+
+## 7. Before going live
+
+1. Change the seeded admin email/password.
+2. Send OTPs by email/SMS instead of displaying them.
+3. Integrate a payment gateway (Razorpay / PayU / Stripe) in `CartController.Checkout`.
+4. Use a production database and set `ASPNETCORE_ENVIRONMENT=Production`.
+5. Point `wwwroot/images/` at your real product photography.
+
+---
+
+## 8. Troubleshooting
+
+| Symptom | Fix |
+|---|---|
+| `dotnet: command not found` | Install the .NET 8 SDK, then reopen the terminal |
+| Port already in use | `dotnet run --urls "http://localhost:5080"` |
+| Stale demo data | Stop the app, delete `matibari.db`, run again |
+| Images missing | Keep the folder `wwwroot/images/` next to `css/` |

@@ -1,0 +1,40 @@
+@using Matibari.Web.Data
+@using Matibari.Web.Models
+@inject AppDbContext Db
+@{
+    /* Shared admin navigation, used by both the fixed sidebar and the mobile offcanvas. */
+    var setting = Db.SiteSettings.FirstOrDefault() ?? new SiteSetting();
+    var current = ViewContext.RouteData.Values["action"]?.ToString() ?? string.Empty;
+    string NavActive(string action) => current == action ? "nav-link active" : "nav-link";
+}
+
+<a href="/Admin/Dashboard" class="d-flex align-items-center gap-2 text-decoration-none mb-4">
+    <img src="@setting.Logo" alt="@setting.BrandName logo" class="mb-brand-logo" width="40" height="40" />
+    <span class="d-flex flex-column">
+        <strong class="mb-admin-brand">@setting.BrandName</strong>
+        <small class="mb-admin-muted">Store admin</small>
+    </span>
+</a>
+
+<p class="mb-admin-label">Workspace</p>
+<ul class="nav flex-column mb-4">
+    <li class="nav-item"><a class="@NavActive("Dashboard")" href="/Admin/Dashboard">📊 Overview</a></li>
+    <li class="nav-item"><a class="@NavActive("Orders")" href="/Admin/Orders">📋 Orders</a></li>
+    <li class="nav-item"><a class="@NavActive("Products")" href="/Admin/Products">📦 Products</a></li>
+    <li class="nav-item"><a class="@NavActive("Settings")" href="/Admin/Settings">⚙️ Store settings</a></li>
+</ul>
+
+<p class="mb-admin-label">Storefront</p>
+<ul class="nav flex-column mb-4">
+    <li class="nav-item">
+        <a class="nav-link" href="/" target="_blank" rel="noopener">🛍️ View store →</a>
+    </li>
+</ul>
+
+<div class="mt-auto">
+    <div class="mb-pay-note mb-admin-note">
+        <strong>🔐 Signed in as</strong><br />
+        @User.Identity?.Name
+    </div>
+    <a class="nav-link" href="/Admin/Logout">🚪 Sign out</a>
+</div>

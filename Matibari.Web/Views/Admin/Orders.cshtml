@@ -5,78 +5,99 @@
     var status = ViewBag.Status as string ?? "All";
 }
 
-<div class="admin-header">
+<div class="mb-page-head">
     <div>
         <h1>Orders</h1>
-        <p class="muted" style="font-size:.85rem;margin:.35rem 0 0">
-            All orders are prepaid online (UPI / Card / Netbanking). Cash on Delivery is disabled.
-        </p>
+        <p>All orders are prepaid online (UPI / Card / Netbanking). Cash on Delivery is disabled.</p>
     </div>
-    <div style="display:flex;gap:.55rem;flex-wrap:wrap">
+    <div class="d-flex flex-wrap gap-2">
         @foreach (var option in new[] { "All", "Processing", "Packed", "Shipped", "Delivered" })
         {
-            <a class="btn btn-sm @(status == option ? "btn-dark" : "btn-ghost")" href="/Admin/Orders?status=@option">@option</a>
+            <a class="btn btn-sm @(status == option ? "btn-brand" : "btn-ghost")"
+               asp-action="Orders" asp-route-status="@option">@option</a>
         }
     </div>
 </div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Order</th>
-            <th>Customer</th>
-            <th>Items</th>
-            <th>Total</th>
-            <th>Payment</th>
-            <th>Status</th>
-            <th style="text-align:right">Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var order in Model)
-        {
-            <tr>
-                <td>
-                    <strong>@order.OrderNumber</strong><br />
-                    <small class="muted">@order.CreatedAt.ToString("dd MMM, hh:mm tt")</small>
-                </td>
-                <td>
-                    @order.Customer<br />
-                    <small class="muted">@order.Email</small>
-                </td>
-                <td>@order.ItemCount ×<br /><small class="muted">@order.ProductName</small></td>
-                <td><strong>₹@order.Total.ToString("N0")</strong></td>
-                <td>
-                    <span class="pill @(order.Payment == "Paid" ? "pill-green" : "pill-red")">
-                        @order.Payment · @order.PaymentMethod
-                    </span>
-                </td>
-                <td>
-                    @switch (order.Status)
-                    {
-                        case "Processing": <span class="pill pill-amber">Processing</span>; break;
-                        case "Packed": <span class="pill pill-amber">Packed</span>; break;
-                        case "Shipped": <span class="pill pill-green">Shipped</span>; break;
-                        default: <span class="pill pill-grey">Delivered</span>; break;
-                    }
-                </td>
-                <td style="text-align:right">
-                    @if (order.Status != "Delivered")
-                    {
-                        <form asp-action="AdvanceOrder" method="post" style="display:inline">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="id" value="@order.Id" />
-                            <button class="btn btn-dark btn-sm" type="submit">
-                                @(order.Status == "Processing" ? "Pack order" : order.Status == "Packed" ? "Ship order" : "Mark delivered")
-                            </button>
-                        </form>
-                    }
-                    else
-                    {
-                        <span class="pill pill-grey">✔ Complete</span>
-                    }
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+@if (Model.Count == 0)
+{
+    <div class="mb-panel text-center">
+        <p class="text-secondary mb-0">No orders match this filter yet.</p>
+    </div>
+}
+else
+{
+    <div class="mb-table-card table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th scope="col">Order</th>
+                    <th scope="col">Customer</th>
+                    <th scope="col">Items</th>
+                    <th scope="col">Total</th>
+                    <th scope="col">Payment</th>
+                    <th scope="col">Status</th>
+                    <th scope="col" class="text-end">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model)
+                {
+                    <tr>
+                        <td>
+                            <strong>@order.OrderNumber</strong><br />
+                            <small class="text-secondary">@order.CreatedAt.ToString("dd MMM, hh:mm tt")</small>
+                        </td>
+                        <td>
+                            @order.Customer<br />
+                            <small class="text-secondary">@order.Email</small>
+                        </td>
+                        <td>
+                            @order.ItemCount ×<br />
+                            <small class="text-secondary">@order.ProductName</small>
+                        </td>
+                        <td><strong>₹@order.Total.ToString("N0")</strong></td>
+                        <td>
+                            <span class="mb-pill @(order.Payment == "Paid" ? "mb-pill-green" : "mb-pill-red")">
+                                @order.Payment · @order.PaymentMethod
+                            </span>
+                        </td>
+                        <td>
+                            @switch (order.Status)
+                            {
+                                case "Processing":
+                                    <span class="mb-pill mb-pill-amber">Processing</span>
+                                    break;
+                                case "Packed":
+                                    <span class="mb-pill mb-pill-amber">Packed</span>
+                                    break;
+                                case "Shipped":
+                                    <span class="mb-pill mb-pill-green">Shipped</span>
+                                    break;
+                                default:
+                                    <span class="mb-pill mb-pill-grey">Delivered</span>
+                                    break;
+                            }
+                        </td>
+                        <td class="text-end">
+                            @if (order.Status != "Delivered")
+                            {
+                                <form asp-action="AdvanceOrder" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@order.Id" />
+                                    <button class="btn btn-brand btn-sm" type="submit">
+                                        @(order.Status == "Processing" ? "Pack order" : order.Status == "Packed" ? "Ship order" : "Mark delivered")
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <span class="mb-pill mb-pill-grey">✔ Complete</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

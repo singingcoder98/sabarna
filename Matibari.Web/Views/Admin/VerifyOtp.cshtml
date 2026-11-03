@@ -4,74 +4,76 @@
     Layout = null;
 }
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-IN" data-bs-theme="light">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"]</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <partial name="_Head" />
 </head>
 <body>
-    <div class="login-wrap">
-        <section class="login-hero">
-            <a href="/" class="brand brand-light">
-                <img src="/images/logo.png" alt="Matibari logo" class="brand-logo" />
-                <span><strong>Matibari</strong><small style="color:rgba(233,196,106,.85)">Admin workspace</small></span>
+    <div class="mb-auth">
+        <section class="mb-auth-hero">
+            <a href="/" class="d-inline-flex align-items-center gap-2 text-decoration-none">
+                <img src="/images/logo.png" alt="Matibari logo" class="mb-brand-logo" width="44" height="44" />
+                <span class="d-flex flex-column">
+                    <strong class="mb-footer-brand">Matibari</strong>
+                    <small class="mb-admin-muted">Admin workspace</small>
+                </span>
             </a>
+
             <div>
-                <span class="hero-badge">🛡️ Step 2 of 2</span>
-                <h1 style="margin-top:1.35rem">Verify<br /><span>your code.</span></h1>
-                <p class="muted-light" style="max-width:26rem">
+                <span class="mb-hero-badge">🛡️ Step 2 of 2</span>
+                <h1 class="mt-3">Verify<span>your code.</span></h1>
+                <p>
                     We sent a 6-digit one-time code to your admin email.
                     Codes expire in 5 minutes and lock after 5 wrong attempts.
                 </p>
             </div>
-            <p style="color:rgba(244,237,216,.45);font-size:.78rem">Handcrafted | Natural | Traditional</p>
+
+            <p class="mb-0" style="color:rgba(244,237,216,.45);font-size:.78rem">
+                Handcrafted | Natural | Traditional
+            </p>
         </section>
 
-        <section class="login-form">
-            <div class="login-card">
-                <a href="/Admin/Login" class="btn btn-ghost btn-sm" style="margin-bottom:2rem">← Use a different account</a>
-                <span class="kicker">Step 2 of 2</span>
-                <h2 style="font-size:2.15rem;color:var(--green-800);margin-top:.55rem">Verify your code</h2>
-                <p class="muted" style="font-size:.88rem">
+        <section class="mb-auth-form">
+            <div class="mb-auth-card">
+                <a asp-action="Login" class="btn btn-ghost btn-sm mb-4">← Use a different account</a>
+
+                <span class="mb-kicker">Step 2 of 2</span>
+                <h2 class="mb-title" style="font-size:2rem">Verify your code</h2>
+                <p class="text-secondary" style="font-size:.88rem">
                     Code sent to <strong>@Model.MaskedDestination</strong>
                 </p>
 
-                <form asp-action="VerifyOtp" method="post" style="margin-top:1.85rem">
+                <form asp-action="VerifyOtp" method="post" class="mt-4">
                     @Html.AntiForgeryToken()
-                    <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+                    <div asp-validation-summary="ModelOnly" class="mb-validation"></div>
 
-                    <label class="field">
-                        <span>6-digit code</span>
-                        <input asp-for="Code"
-                               inputmode="numeric"
-                               maxlength="6"
-                               pattern="[0-9]{6}"
-                               placeholder="••••••"
-                               required
-                               autofocus
-                               style="letter-spacing:.55em;font-size:1.55rem;font-weight:700;text-align:center;height:3.65rem" />
-                    </label>
+                    <div class="mb-3">
+                        <label asp-for="Code" class="form-label">6-digit code</label>
+                        <input asp-for="Code" class="form-control mb-auth-code" inputmode="numeric"
+                               maxlength="6" pattern="[0-9]{6}" placeholder="••••••" autocomplete="one-time-code"
+                               required autofocus />
+                        <span asp-validation-for="Code" class="text-danger small"></span>
+                    </div>
 
                     @if (!string.IsNullOrEmpty(Model.DemoOtp))
                     {
-                        <div style="background:#f5ebcf;color:#7c5b1f;border-radius:.85rem;padding:.85rem 1.15rem;font-size:.76rem;margin-bottom:1.15rem">
+                        <div class="mb-demo-note mb-3">
                             <b>Preview mode:</b> your demo code is
-                            <b style="font-family:monospace;font-size:1.05rem;letter-spacing:.22em">@Model.DemoOtp</b>
+                            <b class="ms-1" style="font-family:monospace;font-size:1.05rem;letter-spacing:.22em">@Model.DemoOtp</b>
                         </div>
                     }
 
-                    <button class="btn btn-primary" type="submit" style="width:100%">Verify &amp; open dashboard →</button>
+                    <button class="btn btn-brand w-100" type="submit">Verify &amp; open dashboard →</button>
                 </form>
 
-                <p class="muted" style="font-size:.72rem;margin-top:1.35rem">
+                <p class="text-secondary mt-4 mb-0" style="font-size:.72rem">
                     🔒 In production this code is delivered by SMS/email through your OTP provider
                     (MSG91 / Twilio) and verified on the server.
                 </p>
             </div>
         </section>
     </div>
+
+    <partial name="_Scripts" />
 </body>
 </html>
