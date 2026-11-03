@@ -1,0 +1,100 @@
+@page "/shop"
+@inject AppDbContext Db
+@inject CartService Cart
+
+<PageTitle>Shop Organic Foods | Matibari</PageTitle>
+
+<section class="section">
+    <div class="container">
+        <div class="center">
+            <span class="kicker">Our Shop</span>
+            <h1 class="section-title">All Organic Products</h1>
+            <p class="lead muted">
+                Individual products, packed fresh. Looking for bundles? Check the
+                <a href="/combos" style="color:var(--terracotta);font-weight:600">Special Combos</a>.
+            </p>
+        </div>
+
+        <div class="center" style="margin:2.25rem 0 2.75rem;display:flex;flex-wrap:wrap;gap:.65rem;justify-content:center">
+            <a class="btn btn-sm @(string.IsNullOrEmpty(Category) ? "btn-dark" : "btn-ghost")" href="/shop">All</a>
+            @foreach (var cat in _categories)
+            {
+                <a class="btn btn-sm @(Category == cat ? "btn-dark" : "btn-ghost")" href="@($"/shop?category={Uri.EscapeDataString(cat)}")">@cat</a>
+            }
+        </div>
+
+        @if (!_products.Any())
+        {
+            <div class="panel center" style="padding:4rem 2rem">
+                <h3>Fresh stock is on its way</h3>
+                <p class="muted">No products are live in this category right now. Please check back soon.</p>
+            </div>
+        }
+        else
+        {
+            <div class="grid grid-3">
+                @foreach (var product in _products)
+                {
+                    <article class="card">
+                        <div class="card-media">
+                            @if (product.HasImage)
+                            {
+                                <img src="@product.Image" alt="@product.Name" loading="lazy" />
+                            }
+                            else
+                            {
+                                <div class="card-placeholder" role="img" aria-label="@product.Name">
+                                    <svg viewBox="0 0 120 120" aria-hidden="true">
+                                        <path d="M60 34c12 6 18 16 18 27 0 12-8 21-18 25-10-4-18-13-18-25 0-11 6-21 18-27z" fill="#7a9b5f"></path>
+                                        <path d="M34 92h52" stroke="#b5582c" stroke-width="4" stroke-linecap="round"></path>
+                                    </svg>
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(product.Tag))
+                            {
+                                <span class="badge">@product.Tag</span>
+                            }
+                        </div>
+                        <div class="card-body">
+                            <div class="stars">★★★★★ <small class="muted">(@product.Reviews)</small></div>
+                            <h2 class="card-title">@product.Name</h2>
+                            <p class="muted" style="font-size:.76rem;margin:0">@product.Unit · @product.Category</p>
+                            <p class="card-desc">@product.Description</p>
+                            <div class="card-foot">
+                                <div>
+                                    <span class="card-price">₹@product.Price</span>
+                                    @if (product.Mrp > product.Price)
+                                    {
+                                        <span class="price-old">₹@product.Mrp</span>
+                                    }
+                                </div>
+                                <button class="btn btn-dark btn-sm" @onclick="() => Cart.Add(product)">Add to Cart</button>
+                            </div>
+                        </div>
+                    </article>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+@code {
+    [SupplyParameterFromQuery(Name = "category")]
+    public string? Category { get; set; }
+
+    private List<Product> _products = new();
+    private List<string> _categories = new();
+
+    protected override void OnParametersSet()
+    {
+        var query = Db.Products.AsNoTracking().Where(p => p.Active && !p.IsCombo);
+
+        _categories = query.Select(p => p.Category).Distinct().ToList();
+
+        _products = (string.IsNullOrWhiteSpace(Category)
+                ? query
+                : query.Where(p => p.Category == Category))
+            .OrderBy(p => p.Id)
+            .ToList();
+    }
+}

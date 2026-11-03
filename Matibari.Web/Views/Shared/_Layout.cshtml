@@ -1,0 +1,147 @@
+@using Matibari.Web.Data
+@using Matibari.Web.Models
+@using Matibari.Web.Services
+@inject AppDbContext Db
+@inject CartService Cart
+@{
+    var setting = Db.SiteSettings.FirstOrDefault() ?? new SiteSetting();
+    var cartCount = Cart.Count;
+    var title = ViewData["Title"] as string ?? "Matibari | Organic A2 Ghee, Raw Forest Honey & Aam ka Achaar";
+}
+<!DOCTYPE html>
+<html lang="en-IN">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@title</title>
+    <meta name="description" content="Buy 100% natural & certified organic A2 Bilona Desi Ghee, Raw Forest Honey, Aam ka Achaar, Bori and special combos from Matibari. Directly sourced from Indian farmers. Fast pan-India delivery." />
+    <meta name="keywords" content="organic ghee, raw forest honey, mango pickle, bori, achar, organic food India, Matibari" />
+    <meta name="robots" content="index, follow" />
+    <link rel="icon" type="image/png" href="@setting.Logo" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="@setting.BrandName — Handcrafted Organic Foods" />
+    <meta property="og:description" content="Organic A2 Ghee, Raw Forest Honey, Achar, Bori & Special Combos — straight from Indian farms." />
+    <meta property="og:image" content="@setting.Logo" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header class="navbar">
+        <div class="container nav-inner">
+            <a href="/" class="brand">
+                <img src="@setting.Logo" alt="@setting.BrandName logo" class="brand-logo" />
+                <span>
+                    <strong>@setting.BrandName</strong>
+                    <small>@setting.Tagline</small>
+                </span>
+            </a>
+
+            <nav class="nav-links" id="navLinks">
+                <a href="/">Home</a>
+                <a href="/Shop">Shop</a>
+                <a href="/Shop/Combos">Combos</a>
+                <a href="/#why">Why Organic</a>
+                <a href="/#process">Our Process</a>
+                <a href="/#faq">FAQ</a>
+                <a href="/#contact">Contact</a>
+            </nav>
+
+            <div class="nav-actions">
+                <a href="/Cart" class="cart-btn" aria-label="Open cart">
+                    🛒 Basket
+                    @if (cartCount > 0)
+                    {
+                        <span class="cart-count">@cartCount</span>
+                    }
+                </a>
+                <a href="/Admin/Login" class="btn btn-ghost">Admin</a>
+                <a href="/Shop" class="btn btn-primary">Shop Now</a>
+            </div>
+
+            <button class="nav-toggle" type="button" onclick="document.getElementById('navLinks').classList.toggle('open')" aria-label="Toggle menu">☰</button>
+        </div>
+    </header>
+
+    @if (TempData["Toast"] is string toast)
+    {
+        <div class="toast">@toast</div>
+    }
+
+    <main>
+        @RenderBody()
+    </main>
+
+    <footer class="footer" id="contact">
+        <div class="container footer-grid">
+            <div>
+                <a href="/" class="brand brand-light">
+                    <img src="@setting.Logo" alt="@setting.BrandName logo" class="brand-logo" />
+                    <strong>@setting.BrandName</strong>
+                </a>
+                <p class="muted-light">Pure, pesticide-free Indian staples grown by farming families and delivered straight to your doorstep.</p>
+                <div class="pay-note">
+                    🔒 <strong>Online payment only.</strong> Cash on Delivery is disabled. We accept UPI, cards &amp; netbanking.
+                </div>
+            </div>
+            <div>
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="/Shop">Shop Products</a></li>
+                    <li><a href="/Shop/Combos">Special Combos</a></li>
+                    <li><a href="/#about">About Us</a></li>
+                    <li><a href="/#process">Our Process</a></li>
+                    <li><a href="/Home/Policies">Store Policies</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Categories</h4>
+                <ul>
+                    <li><a href="/Shop?category=Dairy">Ghee &amp; Dairy</a></li>
+                    <li><a href="/Shop?category=Sweeteners">Honey</a></li>
+                    <li><a href="/Shop?category=Pickles">Achar / Pickles</a></li>
+                    <li><a href="/Shop?category=Bori">Bori</a></li>
+                    <li><a href="/Shop/Combos">Combo Offers</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Get in Touch</h4>
+                <ul>
+                    <li>📍 @setting.Address</li>
+                    <li>📞 @setting.Phone</li>
+                    <li>✉️ @setting.Email</li>
+                    <li>💬 <a href="https://wa.me/@setting.Whatsapp" target="_blank" rel="noopener">WhatsApp enquiry</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container footer-bottom-inner">
+                <p>© @DateTime.Now.Year @setting.BrandName Pvt. Ltd. All rights reserved.</p>
+                <div class="footer-links">
+                    <a href="/Home/Policies#shipping">Shipping</a>
+                    <a href="/Home/Policies#refund">Refunds</a>
+                    <a href="/Home/Policies#privacy">Privacy</a>
+                    <a href="/Home/Policies#terms">Terms</a>
+                    <a href="/Admin/Login">Admin login</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <a class="whatsapp-float" href="https://wa.me/@setting.Whatsapp?text=Hello%20@Uri.EscapeDataString(setting.BrandName)%2C%20I%20would%20like%20to%20know%20more%20about%20your%20organic%20products."
+       target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp">
+        <span class="wa-label"><b>Enquiry?</b> Chat with us on WhatsApp</span>
+        <span class="wa-circle">💬</span>
+    </a>
+
+    <script>
+        // Simple fade-in for product cards
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+        }, { threshold: 0.08 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

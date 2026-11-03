@@ -1,0 +1,55 @@
+@using Matibari.Web.Data
+@inject AppDbContext Db
+@{
+    var setting = Db.SiteSettings.FirstOrDefault() ?? new Matibari.Web.Models.SiteSetting();
+    var current = ViewContext.RouteData.Values["action"]?.ToString();
+    string Active(string action) => current == action ? "nav-item active" : "nav-item";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="admin-wrap">
+        <aside class="admin-side">
+            <a href="/Admin/Dashboard" class="brand brand-light" style="margin-bottom:1.75rem">
+                <img src="@setting.Logo" alt="@setting.BrandName logo" class="brand-logo" />
+                <span>
+                    <strong style="font-size:1.05rem">@setting.BrandName</strong>
+                    <small style="color:rgba(233,196,106,.75)">Store admin</small>
+                </span>
+            </a>
+
+            <p style="font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.35);padding-left:1.15rem">Workspace</p>
+            <a class="@Active("Dashboard")" href="/Admin/Dashboard">📊 Overview</a>
+            <a class="@Active("Orders")" href="/Admin/Orders">📋 Orders</a>
+            <a class="@Active("Products")" href="/Admin/Products">📦 Products</a>
+            <a class="@Active("Settings")" href="/Admin/Settings">⚙️ Store settings</a>
+
+            <p style="font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.35);padding-left:1.15rem;margin-top:1.35rem">Store</p>
+            <a class="nav-item" href="/" target="_blank">🛍️ View storefront →</a>
+
+            <div style="margin-top:auto">
+                <div class="pay-note" style="margin-bottom:1rem">
+                    <b style="color:var(--gold)">🔐 Admin workspace</b><br />
+                    Signed in as @User.Identity?.Name
+                </div>
+                <a class="nav-item" href="/Admin/Logout">🚪 Sign out</a>
+            </div>
+        </aside>
+
+        <main class="admin-main">
+            @if (TempData["Toast"] is string toast)
+            {
+                <div class="toast">@toast</div>
+            }
+            @RenderBody()
+        </main>
+    </div>
+</body>
+</html>

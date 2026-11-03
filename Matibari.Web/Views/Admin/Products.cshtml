@@ -1,0 +1,146 @@
+@model List<Product>
+@{
+    ViewData["Title"] = "Products | Matibari Admin";
+    Layout = "_AdminLayout";
+}
+
+<div class="admin-header">
+    <div>
+        <h1>Products</h1>
+        <p class="muted" style="font-size:.85rem;margin:.35rem 0 0">
+            @Model.Count(p => p.Active) live · @Model.Count total — changes appear on the website instantly.
+        </p>
+    </div>
+    <span class="pill pill-green">Combo products show in "Special Combos"</span>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th>Type</th>
+            <th>Visible</th>
+            <th style="text-align:right">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in Model)
+        {
+            <tr>
+                <td>
+                    <div style="display:flex;align-items:center;gap:.85rem">
+                        @if (product.HasImage)
+                        {
+                            <img src="@product.Image" alt="" style="width:2.75rem;height:2.75rem;border-radius:.75rem;object-fit:cover" />
+                        }
+                        else
+                        {
+                            <div style="width:2.75rem;height:2.75rem;border-radius:.75rem;background:linear-gradient(135deg,#f7efdc,#e3cfa4)"></div>
+                        }
+                        <div>
+                            <strong>@product.Name</strong><br />
+                            <small class="muted">@product.Unit</small>
+                        </div>
+                    </div>
+                </td>
+                <td>@product.Category</td>
+                <td>
+                    <strong>₹@product.Price</strong>
+                    @if (product.Mrp > product.Price)
+                    {
+                        <br />
+                        <small class="muted" style="text-decoration:line-through">₹@product.Mrp</small>
+                    }
+                </td>
+                <td>
+                    @if (product.Stock < 20)
+                    {
+                        <span class="pill pill-red">@product.Stock units</span>
+                    }
+                    else
+                    {
+                        <span class="pill pill-green">@product.Stock units</span>
+                    }
+                </td>
+                <td>
+                    @if (product.IsCombo)
+                    {
+                        <span class="pill pill-amber">@(product.Featured ? "Featured Combo" : "Combo")</span>
+                    }
+                    else
+                    {
+                        <span class="pill pill-grey">Individual</span>
+                    }
+                </td>
+                <td>
+                    <form asp-action="ToggleProduct" method="post" style="display:inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@product.Id" />
+                        <button class="btn btn-sm @(product.Active ? "btn-dark" : "btn-ghost")" type="submit">
+                            @(product.Active ? "Live" : "Hidden")
+                        </button>
+                    </form>
+                </td>
+                <td style="text-align:right">
+                    <details style="display:inline-block;text-align:left">
+                        <summary class="btn btn-ghost btn-sm" style="cursor:pointer;list-style:none">Edit</summary>
+                        <div class="panel" style="position:absolute;right:1rem;z-index:20;width:min(30rem,92vw);margin-top:.55rem">
+                            <form asp-action="SaveProduct" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="Id" value="@product.Id" />
+
+                                <label class="field"><span>Name</span><input name="Name" value="@product.Name" required /></label>
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:.85rem">
+                                    <label class="field"><span>Category</span><input name="Category" value="@product.Category" /></label>
+                                    <label class="field"><span>Pack size</span><input name="Unit" value="@product.Unit" /></label>
+                                    <label class="field"><span>Price (₹)</span><input name="Price" type="number" step="0.01" value="@product.Price" /></label>
+                                    <label class="field"><span>MRP (₹)</span><input name="Mrp" type="number" step="0.01" value="@product.Mrp" /></label>
+                                    <label class="field"><span>Stock</span><input name="Stock" type="number" value="@product.Stock" /></label>
+                                    <label class="field"><span>Badge</span><input name="Tag" value="@product.Tag" /></label>
+                                </div>
+                                <label class="field"><span>Image URL</span><input name="Image" value="@product.Image" placeholder="/images/product-x.jpg" /></label>
+                                <label class="field"><span>Description</span><textarea name="Description" rows="3">@product.Description</textarea></label>
+
+                                <div style="display:flex;gap:1.15rem;margin:.85rem 0;flex-wrap:wrap">
+                                    <label style="display:flex;align-items:center;gap:.45rem;font-size:.8rem">
+                                        <input type="hidden" name="Active" value="false" />
+                                        <input type="checkbox" name="Active" value="true" @(product.Active ? "checked" : "") /> Show in shop
+                                    </label>
+                                    <label style="display:flex;align-items:center;gap:.45rem;font-size:.8rem">
+                                        <input type="hidden" name="IsCombo" value="false" />
+                                        <input type="checkbox" name="IsCombo" value="true" @(product.IsCombo ? "checked" : "") /> Combo / bundle
+                                    </label>
+                                    <label style="display:flex;align-items:center;gap:.45rem;font-size:.8rem">
+                                        <input type="hidden" name="Featured" value="false" />
+                                        <input type="checkbox" name="Featured" value="true" @(product.Featured ? "checked" : "") /> Featured combo
+                                    </label>
+                                </div>
+
+                                <label class="field">
+                                    <span>Combo items (JSON)</span>
+                                    <textarea name="ComboItemsJson" rows="3">@product.ComboItemsJson</textarea>
+                                    <small>Format: [{"name":"Tok-Jhal Achar","qty":1,"image":"/images/product-pickle.jpg"}]</small>
+                                </label>
+
+                                <button class="btn btn-primary btn-sm" type="submit">Save changes</button>
+                            </form>
+                        </div>
+                    </details>
+
+                    <form asp-action="DeleteProduct" method="post" style="display:inline"
+                          onsubmit="return confirm('Delete this product permanently?');">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@product.Id" />
+                        <button class="btn btn-sm" type="submit"
+                                style="background:#fdeeea;color:#b8543c">
+                            Delete
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

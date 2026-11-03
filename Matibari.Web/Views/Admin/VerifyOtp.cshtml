@@ -1,0 +1,77 @@
+@model OtpViewModel
+@{
+    ViewData["Title"] = "Verify OTP | Matibari Admin";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="login-wrap">
+        <section class="login-hero">
+            <a href="/" class="brand brand-light">
+                <img src="/images/logo.png" alt="Matibari logo" class="brand-logo" />
+                <span><strong>Matibari</strong><small style="color:rgba(233,196,106,.85)">Admin workspace</small></span>
+            </a>
+            <div>
+                <span class="hero-badge">🛡️ Step 2 of 2</span>
+                <h1 style="margin-top:1.35rem">Verify<br /><span>your code.</span></h1>
+                <p class="muted-light" style="max-width:26rem">
+                    We sent a 6-digit one-time code to your admin email.
+                    Codes expire in 5 minutes and lock after 5 wrong attempts.
+                </p>
+            </div>
+            <p style="color:rgba(244,237,216,.45);font-size:.78rem">Handcrafted | Natural | Traditional</p>
+        </section>
+
+        <section class="login-form">
+            <div class="login-card">
+                <a href="/Admin/Login" class="btn btn-ghost btn-sm" style="margin-bottom:2rem">← Use a different account</a>
+                <span class="kicker">Step 2 of 2</span>
+                <h2 style="font-size:2.15rem;color:var(--green-800);margin-top:.55rem">Verify your code</h2>
+                <p class="muted" style="font-size:.88rem">
+                    Code sent to <strong>@Model.MaskedDestination</strong>
+                </p>
+
+                <form asp-action="VerifyOtp" method="post" style="margin-top:1.85rem">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+                    <label class="field">
+                        <span>6-digit code</span>
+                        <input asp-for="Code"
+                               inputmode="numeric"
+                               maxlength="6"
+                               pattern="[0-9]{6}"
+                               placeholder="••••••"
+                               required
+                               autofocus
+                               style="letter-spacing:.55em;font-size:1.55rem;font-weight:700;text-align:center;height:3.65rem" />
+                    </label>
+
+                    @if (!string.IsNullOrEmpty(Model.DemoOtp))
+                    {
+                        <div style="background:#f5ebcf;color:#7c5b1f;border-radius:.85rem;padding:.85rem 1.15rem;font-size:.76rem;margin-bottom:1.15rem">
+                            <b>Preview mode:</b> your demo code is
+                            <b style="font-family:monospace;font-size:1.05rem;letter-spacing:.22em">@Model.DemoOtp</b>
+                        </div>
+                    }
+
+                    <button class="btn btn-primary" type="submit" style="width:100%">Verify &amp; open dashboard →</button>
+                </form>
+
+                <p class="muted" style="font-size:.72rem;margin-top:1.35rem">
+                    🔒 In production this code is delivered by SMS/email through your OTP provider
+                    (MSG91 / Twilio) and verified on the server.
+                </p>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

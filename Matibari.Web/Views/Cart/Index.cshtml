@@ -1,0 +1,118 @@
+@model CheckoutViewModel
+@{
+    ViewData["Title"] = "Your Basket | Matibari";
+    var hasItems = Model.Lines.Any();
+}
+
+<section class="section">
+    <div class="container">
+        <div class="center">
+            <span class="kicker">Your Basket</span>
+            <h2 class="section-title">Review &amp; Checkout</h2>
+            <p class="lead muted">🔒 <strong>100% Online Payment Only</strong> — Cash on Delivery is not available.</p>
+        </div>
+
+        @if (!hasItems)
+        {
+            <div class="panel center" style="max-width:34rem;margin:2.75rem auto;padding:3.5rem 2rem">
+                <div style="font-size:2.75rem">🛒</div>
+                <h3 style="margin-top:.85rem">Your basket is empty</h3>
+                <p class="muted">Add some organic goodness — ghee, honey, achar, bori or a special combo.</p>
+                <a class="btn btn-primary" href="/Shop" style="margin-top:1rem">Start Shopping</a>
+            </div>
+        }
+        else
+        {
+            <div class="grid-cart" style="margin-top:2.75rem">
+                <div>
+                    <h3 style="margin-bottom:1.15rem">Items (@Model.Lines.Sum(l => l.Qty))</h3>
+                    <div style="display:grid;gap:1rem">
+                        @foreach (var line in Model.Lines)
+                        {
+                            <div class="cart-line">
+                                @if (!string.IsNullOrEmpty(line.Image))
+                                {
+                                    <img src="@line.Image" alt="@line.Name" />
+                                }
+                                else
+                                {
+                                    <div class="thumb-ph"></div>
+                                }
+                                <div style="flex:1">
+                                    <div style="display:flex;justify-content:space-between;gap:1rem">
+                                        <div>
+                                            <strong>@line.Name</strong>
+                                            @if (!string.IsNullOrEmpty(line.Includes))
+                                            {
+                                                <p style="font-size:.72rem;color:var(--muted);margin:.35rem 0 0">Includes: @line.Includes</p>
+                                            }
+                                        </div>
+                                        <span class="card-price">₹@line.LineTotal</span>
+                                    </div>
+                                    <div style="display:flex;align-items:center;gap:1rem;margin-top:.85rem">
+                                        <form asp-action="Update" method="post" class="qty">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@line.ProductId" />
+                                            <button type="submit" name="qty" value="@(line.Qty - 1)" aria-label="Decrease">−</button>
+                                            <span>@line.Qty</span>
+                                            <button type="submit" name="qty" value="@(line.Qty + 1)" aria-label="Increase">+</button>
+                                        </form>
+                                        <form asp-action="Remove" method="post">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@line.ProductId" />
+                                            <button class="btn btn-ghost btn-sm" type="submit">Remove</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>Delivery &amp; Payment</h3>
+                    <form asp-action="Checkout" method="post" style="margin-top:1.15rem">
+                        @Html.AntiForgeryToken()
+                        <label class="field">
+                            <span>Full name</span>
+                            <input asp-for="Customer" placeholder="Your name" required />
+                        </label>
+                        <label class="field">
+                            <span>Email</span>
+                            <input asp-for="Email" type="email" placeholder="you@@example.com" required />
+                        </label>
+                        <label class="field">
+                            <span>Phone</span>
+                            <input asp-for="Phone" placeholder="+91 98765 43210" required />
+                        </label>
+                        <label class="field">
+                            <span>Delivery address</span>
+                            <textarea asp-for="Address" rows="3" placeholder="House, street, city, PIN code" required></textarea>
+                        </label>
+                        <label class="field">
+                            <span>Payment method (online only)</span>
+                            <select asp-for="PaymentMethod">
+                                <option value="UPI">UPI (GPay / PhonePe / Paytm)</option>
+                                <option value="Card">Credit / Debit Card</option>
+                                <option value="Netbanking">Netbanking</option>
+                            </select>
+                            <small>🚫 Cash on Delivery is disabled. All orders are prepaid.</small>
+                        </label>
+
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:.95rem 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:1.15rem 0">
+                            <strong>Subtotal</strong>
+                            <strong class="card-price">₹@Model.Total</strong>
+                        </div>
+
+                        <button class="btn btn-primary" type="submit" style="width:100%">
+                            🔒 Pay ₹@Model.Total Securely
+                        </button>
+                        <p class="center muted" style="font-size:.72rem;margin-top:.85rem">
+                            Free shipping on orders above ₹999 · 256-bit encrypted checkout
+                        </p>
+                    </form>
+                </div>
+            </div>
+        }
+    </div>
+</section>

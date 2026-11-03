@@ -1,0 +1,256 @@
+@page "/admin/products"
+@layout AdminLayout
+@inject AppDbContext Db
+@inject AdminState Admin
+@inject NavigationManager Nav
+
+<PageTitle>Products | Matibari Admin</PageTitle>
+
+@if (!Admin.IsAuthenticated)
+{
+    <p class="muted">Redirecting to login…</p>
+}
+else
+{
+    <div class="admin-header">
+        <div>
+            <h1>Products</h1>
+            <p class="muted" style="font-size:.85rem;margin:.35rem 0 0">
+                @_products.Count(p => p.Active) live · @_products.Count total — changes appear on the website instantly.
+            </p>
+        </div>
+        <button class="btn btn-primary btn-sm" @onclick="StartNew">＋ Add product</button>
+    </div>
+
+    @if (_editing is not null)
+    {
+        <div class="panel" style="margin-bottom:1.5rem">
+            <h3 style="margin-bottom:1.15rem">@(_isNew ? "New product" : $"Edit: {_editing.Name}")</h3>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));gap:.85rem">
+                <label class="field"><span>Name</span><input @bind="_editing.Name" /></label>
+                <label class="field"><span>Category</span><input @bind="_editing.Category" /></label>
+                <label class="field"><span>Pack size</span><input @bind="_editing.Unit" /></label>
+                <label class="field"><span>Price (₹)</span><input @bind="_editing.Price" type="number" step="0.01" /></label>
+                <label class="field"><span>MRP (₹)</span><input @bind="_editing.Mrp" type="number" step="0.01" /></label>
+                <label class="field"><span>Stock</span><input @bind="_editing.Stock" type="number" /></label>
+                <label class="field"><span>Badge</span><input @bind="_editing.Tag" /></label>
+                <label class="field"><span>Image URL</span><input @bind="_editing.Image" placeholder="/images/product-x.jpg" /></label>
+            </div>
+
+            <label class="field"><span>Description</span><textarea @bind="_editing.Description" rows="3"></textarea></label>
+
+            <div style="display:flex;gap:1.35rem;flex-wrap:wrap;margin:.85rem 0 1.15rem">
+                <label style="display:flex;align-items:center;gap:.45rem;font-size:.82rem">
+                    <input type="checkbox" @bind="_editing.Active" /> Show in shop
+                </label>
+                <label style="display:flex;align-items:center;gap:.45rem;font-size:.82rem">
+                    <input type="checkbox" @bind="_editing.IsCombo" /> Combo / bundle product
+                </label>
+                @if (_editing.IsCombo)
+                {
+                    <label style="display:flex;align-items:center;gap:.45rem;font-size:.82rem">
+                        <input type="checkbox" @bind="_editing.Featured" /> Featured combo (biggest card)
+                    </label>
+                }
+            </div>
+
+            @if (_editing.IsCombo)
+            {
+                <label class="field">
+                    <span>Combo items (JSON)</span>
+                    <textarea @bind="_editing.ComboItemsJson" rows="3"></textarea>
+                    <small>Format: [{"name":"Tok-Jhal Achar","qty":1,"image":"/images/product-pickle.jpg"}]</small>
+                </label>
+            }
+
+            <div style="display:flex;gap:.75rem">
+                <button class="btn btn-primary btn-sm" @onclick="Save">💾 Save changes</button>
+                <button class="btn btn-ghost btn-sm" @onclick="Cancel">Cancel</button>
+            </div>
+
+            @if (!string.IsNullOrEmpty(_message))
+            {
+                <div class="alert alert-success" style="margin-top:1.15rem">@_message</div>
+            }
+        </div>
+    }
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Type</th>
+                <th>Visible</th>
+                <th style="text-align:right">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in _products)
+            {
+                <tr>
+                    <td>
+                        <div style="display:flex;align-items:center;gap:.85rem">
+                            @if (product.HasImage)
+                            {
+                                <img src="@product.Image" alt="" style="width:2.75rem;height:2.75rem;border-radius:.75rem;object-fit:cover" />
+                            }
+                            else
+                            {
+                                <div style="width:2.75rem;height:2.75rem;border-radius:.75rem;background:linear-gradient(135deg,#f7efdc,#e3cfa4)"></div>
+                            }
+                            <div>
+                                <strong>@product.Name</strong><br />
+                                <small class="muted">@product.Unit</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>@product.Category</td>
+                    <td>
+                        <strong>₹@product.Price</strong>
+                        @if (product.Mrp > product.Price)
+                        {
+                            <br />
+                            <small class="muted" style="text-decoration:line-through">₹@product.Mrp</small>
+                        }
+                    </td>
+                    <td><span class="pill @(product.Stock < 20 ? "pill-red" : "pill-green")">@product.Stock units</span></td>
+                    <td>
+                        @if (product.IsCombo)
+                        {
+                            <span class="pill pill-amber">@(product.Featured ? "Featured Combo" : "Combo")</span>
+                        }
+                        else
+                        {
+                            <span class="pill pill-grey">Individual</span>
+                        }
+                    </td>
+                    <td>
+                        <button class="btn btn-sm @(product.Active ? "btn-dark" : "btn-ghost")" @onclick="() => Toggle(product)">
+                            @(product.Active ? "Live" : "Hidden")
+                        </button>
+                    </td>
+                    <td style="text-align:right">
+                        <button class="btn btn-ghost btn-sm" @onclick="() => StartEdit(product)">Edit</button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => Delete(product)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Product> _products = new();
+    private Product? _editing;
+    private bool _isNew;
+    private string? _message;
+
+    protected override void OnInitialized()
+    {
+        if (!Admin.IsAuthenticated)
+        {
+            Nav.NavigateTo("/admin/login");
+            return;
+        }
+
+        Load();
+    }
+
+    private void Load() => _products = Db.Products.AsNoTracking().OrderBy(p => p.Id).ToList();
+
+    private void StartEdit(Product product)
+    {
+        _isNew = false;
+        _message = null;
+        _editing = new Product
+        {
+            Id = product.Id,
+            Name = product.Name,
+            Category = product.Category,
+            Price = product.Price,
+            Mrp = product.Mrp,
+            Unit = product.Unit,
+            Tag = product.Tag,
+            Description = product.Description,
+            Image = product.Image,
+            Stock = product.Stock,
+            Active = product.Active,
+            IsCombo = product.IsCombo,
+            Featured = product.Featured,
+            ComboItemsJson = product.ComboItemsJson
+        };
+    }
+
+    private void StartNew()
+    {
+        _isNew = true;
+        _message = null;
+        _editing = new Product { Name = "New product", Category = "General", Active = true };
+    }
+
+    private void Cancel()
+    {
+        _editing = null;
+        _message = null;
+    }
+
+    private void Save()
+    {
+        if (_editing is null) return;
+
+        if (_isNew)
+        {
+            _editing.CreatedAt = DateTime.UtcNow;
+            Db.Products.Add(_editing);
+        }
+        else
+        {
+            var entity = Db.Products.Find(_editing.Id);
+            if (entity is null) return;
+
+            entity.Name = _editing.Name;
+            entity.Category = _editing.Category;
+            entity.Price = _editing.Price;
+            entity.Mrp = _editing.Mrp;
+            entity.Unit = _editing.Unit;
+            entity.Tag = _editing.Tag;
+            entity.Description = _editing.Description;
+            entity.Image = _editing.Image;
+            entity.Stock = _editing.Stock;
+            entity.Active = _editing.Active;
+            entity.IsCombo = _editing.IsCombo;
+            entity.Featured = _editing.Featured;
+            entity.ComboItemsJson = _editing.ComboItemsJson;
+        }
+
+        Db.SaveChanges();
+        _message = "Product saved ✅";
+        _editing = null;
+        _isNew = false;
+        Load();
+    }
+
+    private void Toggle(Product product)
+    {
+        var entity = Db.Products.Find(product.Id);
+        if (entity is null) return;
+
+        entity.Active = !entity.Active;
+        Db.SaveChanges();
+        Load();
+    }
+
+    private void Delete(Product product)
+    {
+        var entity = Db.Products.Find(product.Id);
+        if (entity is null) return;
+
+        Db.Products.Remove(entity);
+        Db.SaveChanges();
+        Load();
+    }
+}

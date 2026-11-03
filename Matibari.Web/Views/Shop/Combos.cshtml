@@ -1,0 +1,113 @@
+@model List<Product>
+@{
+    ViewData["Title"] = "Special Combos — More Goodness, More Value! | Matibari";
+}
+
+<section class="section combos">
+    <div class="container">
+        <div class="center">
+            <span class="hero-badge">✨ Limited Period Bundles</span>
+            <h2 class="section-title combo-title" style="margin-top:1.35rem">
+                Special Combos — <span>More Goodness, More Value!</span>
+            </h2>
+            <p class="lead muted-light">
+                Bundled together at a price that makes more sense — perfect for gifting,
+                stocking up or tasting the full Matibari range.
+            </p>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="panel center" style="margin-top:2.5rem;padding:3.5rem">
+                <h3>Combos are being restocked</h3>
+                <p class="muted">Please check back soon or browse our <a href="/Shop" style="color:var(--terracotta);font-weight:600">individual products</a>.</p>
+            </div>
+        }
+        else
+        {
+            <div class="grid grid-2" style="margin-top:3.25rem">
+                @foreach (var combo in Model)
+                {
+                    var items = CartService.GetComboItems(combo);
+                    var saved = combo.Mrp > combo.Price ? combo.Mrp - combo.Price : 0;
+                    var percent = combo.Mrp > 0 ? (int)Math.Round((double)(saved / combo.Mrp * 100)) : 0;
+
+                    <article class="combo-card @(combo.Featured ? "featured" : "") reveal">
+                        <div>
+                            <div class="combo-badges">
+                                <span class="combo-badge">✨ Special Combo</span>
+                                @if (!string.IsNullOrEmpty(combo.Tag))
+                                {
+                                    <span class="combo-badge @(combo.Featured ? "terra" : "outline")">@combo.Tag</span>
+                                }
+                            </div>
+                            <h3>@combo.Name</h3>
+                            <p>@combo.Description</p>
+
+                            <div class="combo-includes">
+                                @foreach (var item in items)
+                                {
+                                    <span class="combo-include">
+                                        @if (!string.IsNullOrEmpty(item.Image))
+                                        {
+                                            <img src="@item.Image" alt="@item.Name" loading="lazy" />
+                                        }
+                                        else
+                                        {
+                                            <span class="thumb-ph"></span>
+                                        }
+                                        @item.Name@(item.Qty > 1 ? $" ×{item.Qty}" : "")
+                                    </span>
+                                }
+                            </div>
+
+                            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:1rem;margin:1.35rem 0">
+                                <div class="combo-price">
+                                    ₹@combo.Price
+                                    @if (combo.Mrp > combo.Price)
+                                    {
+                                        <small>₹@combo.Mrp</small>
+                                    }
+                                </div>
+                                @if (saved > 0)
+                                {
+                                    <span class="combo-save">Save ₹@saved · @percent% off</span>
+                                }
+                            </div>
+
+                            <form asp-controller="Cart" asp-action="Add" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@combo.Id" />
+                                <input type="hidden" name="returnUrl" value="/Shop/Combos" />
+                                <button class="btn @(combo.Featured ? "btn-gold" : "btn-primary")" type="submit">
+                                    @(combo.Featured ? "Buy This Combo" : "Buy Combo")
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="combo-media">
+                            @foreach (var item in items)
+                            {
+                                <figure>
+                                    @if (!string.IsNullOrEmpty(item.Image))
+                                    {
+                                        <img src="@item.Image" alt="@item.Name" loading="lazy" />
+                                    }
+                                    else
+                                    {
+                                        <div class="card-placeholder thumb-ph" style="height:8.5rem">
+                                            <svg viewBox="0 0 120 120" aria-hidden="true">
+                                                <path d="M60 34c12 6 18 16 18 27 0 12-8 21-18 25-10-4-18-13-18-25 0-11 6-21 18-27z" fill="#7a9b5f"></path>
+                                            </svg>
+                                        </div>
+                                    }
+                                    <figcaption>@item.Name</figcaption>
+                                </figure>
+                            }
+                        </div>
+                    </article>
+                }
+            </div>
+        }
+    </div>
+</section>

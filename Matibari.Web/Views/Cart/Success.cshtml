@@ -1,0 +1,21 @@
+@{
+    ViewData["Title"] = "Order Confirmed | Matibari";
+    var orderNumber = TempData["OrderNumber"] as string ?? "MB-00000";
+}
+
+<section class="section">
+    <div class="container">
+        <div class="panel center" style="max-width:36rem;margin:0 auto;padding:3.5rem 2.25rem">
+            <div style="font-size:3.25rem">✅</div>
+            <h2 class="section-title" style="font-size:2rem">Payment Successful!</h2>
+            <p class="muted">
+                Order <strong>@orderNumber</strong> is confirmed. A receipt has been sent to your email.
+                Our farm team will pack and ship your order within 24 hours.
+            </p>
+            <div style="display:flex;gap:.85rem;justify-content:center;flex-wrap:wrap;margin-top:1.75rem">
+                <a class="btn btn-primary" href="/Shop">Continue Shopping</a>
+                <a class="btn btn-ghost" href="/">Back to Home</a>
+            </div>
+        </div>
+    </div>
+</section>

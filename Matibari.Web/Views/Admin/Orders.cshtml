@@ -1,0 +1,82 @@
+@model List<Order>
+@{
+    ViewData["Title"] = "Orders | Matibari Admin";
+    Layout = "_AdminLayout";
+    var status = ViewBag.Status as string ?? "All";
+}
+
+<div class="admin-header">
+    <div>
+        <h1>Orders</h1>
+        <p class="muted" style="font-size:.85rem;margin:.35rem 0 0">
+            All orders are prepaid online (UPI / Card / Netbanking). Cash on Delivery is disabled.
+        </p>
+    </div>
+    <div style="display:flex;gap:.55rem;flex-wrap:wrap">
+        @foreach (var option in new[] { "All", "Processing", "Packed", "Shipped", "Delivered" })
+        {
+            <a class="btn btn-sm @(status == option ? "btn-dark" : "btn-ghost")" href="/Admin/Orders?status=@option">@option</a>
+        }
+    </div>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Order</th>
+            <th>Customer</th>
+            <th>Items</th>
+            <th>Total</th>
+            <th>Payment</th>
+            <th>Status</th>
+            <th style="text-align:right">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var order in Model)
+        {
+            <tr>
+                <td>
+                    <strong>@order.OrderNumber</strong><br />
+                    <small class="muted">@order.CreatedAt.ToString("dd MMM, hh:mm tt")</small>
+                </td>
+                <td>
+                    @order.Customer<br />
+                    <small class="muted">@order.Email</small>
+                </td>
+                <td>@order.ItemCount ×<br /><small class="muted">@order.ProductName</small></td>
+                <td><strong>₹@order.Total.ToString("N0")</strong></td>
+                <td>
+                    <span class="pill @(order.Payment == "Paid" ? "pill-green" : "pill-red")">
+                        @order.Payment · @order.PaymentMethod
+                    </span>
+                </td>
+                <td>
+                    @switch (order.Status)
+                    {
+                        case "Processing": <span class="pill pill-amber">Processing</span>; break;
+                        case "Packed": <span class="pill pill-amber">Packed</span>; break;
+                        case "Shipped": <span class="pill pill-green">Shipped</span>; break;
+                        default: <span class="pill pill-grey">Delivered</span>; break;
+                    }
+                </td>
+                <td style="text-align:right">
+                    @if (order.Status != "Delivered")
+                    {
+                        <form asp-action="AdvanceOrder" method="post" style="display:inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@order.Id" />
+                            <button class="btn btn-dark btn-sm" type="submit">
+                                @(order.Status == "Processing" ? "Pack order" : order.Status == "Packed" ? "Ship order" : "Mark delivered")
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <span class="pill pill-grey">✔ Complete</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,86 @@
+@model AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard | Matibari Admin";
+    Layout = "_AdminLayout";
+}
+
+<div class="admin-header">
+    <div>
+        <h1>Overview</h1>
+        <p class="muted" style="font-size:.85rem;margin:.35rem 0 0">
+            @DateTime.Now.ToString("dddd, dd MMMM yyyy") · Manage your organic store with care.
+        </p>
+    </div>
+    <a class="btn btn-primary btn-sm" href="/Admin/Orders">Review orders →</a>
+</div>
+
+<div class="stat-grid">
+    <div class="stat"><small>Gross revenue</small><strong>₹@Model.Revenue.ToString("N0")</strong></div>
+    <div class="stat"><small>Orders placed</small><strong>@Model.TotalOrders</strong></div>
+    <div class="stat"><small>Products (live / total)</small><strong>@Model.LiveProducts / @Model.TotalProducts</strong></div>
+    <div class="stat"><small>Low stock items</small><strong>@Model.LowStock.Count</strong></div>
+</div>
+
+<div class="grid grid-2" style="margin-top:1.5rem;align-items:start">
+    <div>
+        <h3 style="margin-bottom:1rem">Recent orders</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Order</th>
+                    <th>Customer</th>
+                    <th>Total</th>
+                    <th>Payment</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model.RecentOrders)
+                {
+                    <tr>
+                        <td><strong>@order.OrderNumber</strong></td>
+                        <td>@order.Customer<br /><small class="muted">@order.Email</small></td>
+                        <td>₹@order.Total.ToString("N0")</td>
+                        <td><span class="pill pill-green">@order.Payment · @order.PaymentMethod</span></td>
+                        <td>
+                            @switch (order.Status)
+                            {
+                                case "Processing": <span class="pill pill-amber">Processing</span>; break;
+                                case "Packed": <span class="pill pill-amber">Packed</span>; break;
+                                case "Shipped": <span class="pill pill-green">Shipped</span>; break;
+                                default: <span class="pill pill-grey">Delivered</span>; break;
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div>
+        <h3 style="margin-bottom:1rem">Low stock alerts</h3>
+        @if (!Model.LowStock.Any())
+        {
+            <div class="panel center">
+                <p class="muted" style="margin:0">✅ All products are well stocked.</p>
+            </div>
+        }
+        else
+        {
+            <table class="table">
+                <thead>
+                    <tr><th>Product</th><th>Stock</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var product in Model.LowStock)
+                    {
+                        <tr>
+                            <td>@product.Name</td>
+                            <td><span class="pill pill-red">@product.Stock units</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>

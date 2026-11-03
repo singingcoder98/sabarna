@@ -1,0 +1,127 @@
+@page "/admin/settings"
+@layout AdminLayout
+@inject AppDbContext Db
+@inject AdminState Admin
+@inject NavigationManager Nav
+
+<PageTitle>Store Settings | Matibari Admin</PageTitle>
+
+@if (!Admin.IsAuthenticated)
+{
+    <p class="muted">Redirecting to login…</p>
+}
+else
+{
+    <div class="admin-header">
+        <div>
+            <h1>Store settings</h1>
+            <p class="muted" style="font-size:.85rem;margin:.35rem 0 0">
+                Every field saves to the database and updates the live website.
+            </p>
+        </div>
+    </div>
+
+    <div class="grid grid-2" style="align-items:start">
+        <div class="panel">
+            <h3>Brand identity</h3>
+            <label class="field"><span>Brand name</span><input @bind="_setting.BrandName" /></label>
+            <label class="field"><span>Tagline</span><input @bind="_setting.Tagline" /></label>
+            <label class="field">
+                <span>Logo path / URL</span>
+                <input @bind="_setting.Logo" placeholder="/images/logo.png" />
+                <small>Upload your logo to wwwroot/images/ and give the path here.</small>
+            </label>
+        </div>
+
+        <div class="panel">
+            <h3>Hero banner</h3>
+            <label class="field"><span>Top label</span><input @bind="_setting.HeroKicker" /></label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.85rem">
+                <label class="field"><span>Headline (line 1)</span><input @bind="_setting.HeroTitle1" /></label>
+                <label class="field"><span>Headline (line 2, highlighted)</span><input @bind="_setting.HeroTitle2" /></label>
+            </div>
+            <label class="field"><span>Intro text</span><textarea @bind="_setting.HeroText" rows="4"></textarea></label>
+        </div>
+
+        <div class="panel">
+            <h3>Contact &amp; WhatsApp</h3>
+            <label class="field"><span>Email</span><input @bind="_setting.Email" /></label>
+            <label class="field"><span>Phone</span><input @bind="_setting.Phone" /></label>
+            <label class="field">
+                <span>WhatsApp number (for the chat button)</span>
+                <input @bind="_setting.Whatsapp" placeholder="919876543210" />
+                <small>Country code ke saath, sirf digits. India ke liye 91 + 10 digit number.</small>
+            </label>
+            <label class="field"><span>Address</span><textarea @bind="_setting.Address" rows="3"></textarea></label>
+        </div>
+
+        <div class="panel">
+            <h3>How this works</h3>
+            <div style="display:grid;gap:.85rem;font-size:.82rem;color:var(--muted)">
+                <div style="background:#f4f7f2;border-radius:.85rem;padding:1rem">
+                    <b style="color:#3c5140">Database connected:</b> changes are saved to the SQLite
+                    database (<code>matibari.db</code>) and shown to every visitor.
+                </div>
+                <div style="background:#f8f3e4;border-radius:.85rem;padding:1rem">
+                    <b style="color:#7c6a41">Going bigger:</b> switch <code>appsettings.json</code>
+                    to SQL Server / PostgreSQL — the same code keeps working.
+                </div>
+                <div style="background:#eef4ec;border-radius:.85rem;padding:1rem">
+                    <b style="color:#3c5140">Payments:</b> Razorpay keys go in
+                    <code>appsettings.json</code> when you integrate the gateway.
+                </div>
+            </div>
+
+            <button class="btn btn-primary" style="width:100%;margin-top:1.35rem" @onclick="Save">
+                💾 Save all changes
+            </button>
+
+            @if (!string.IsNullOrEmpty(_message))
+            {
+                <div class="alert alert-success" style="margin-top:1.15rem">@_message</div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    private SiteSetting _setting = new();
+    private string? _message;
+
+    protected override void OnInitialized()
+    {
+        if (!Admin.IsAuthenticated)
+        {
+            Nav.NavigateTo("/admin/login");
+            return;
+        }
+
+        _setting = Db.SiteSettings.FirstOrDefault() ?? new SiteSetting();
+    }
+
+    private void Save()
+    {
+        var entity = Db.SiteSettings.FirstOrDefault();
+        if (entity is null)
+        {
+            Db.SiteSettings.Add(_setting);
+        }
+        else
+        {
+            entity.BrandName = _setting.BrandName;
+            entity.Tagline = _setting.Tagline;
+            entity.Logo = _setting.Logo;
+            entity.Email = _setting.Email;
+            entity.Phone = _setting.Phone;
+            entity.Whatsapp = _setting.Whatsapp;
+            entity.Address = _setting.Address;
+            entity.HeroKicker = _setting.HeroKicker;
+            entity.HeroTitle1 = _setting.HeroTitle1;
+            entity.HeroTitle2 = _setting.HeroTitle2;
+            entity.HeroText = _setting.HeroText;
+        }
+
+        Db.SaveChanges();
+        _message = "Store settings saved ✅";
+    }
+}

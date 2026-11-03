@@ -1,0 +1,148 @@
+@page "/admin/login"
+@layout EmptyLayout
+@inject AdminState Admin
+@inject NavigationManager Nav
+
+<PageTitle>Admin Login | Matibari</PageTitle>
+
+<div class="login-wrap">
+    <section class="login-hero">
+        <a href="/" class="brand brand-light">
+            <img src="/images/logo.png" alt="Matibari logo" class="brand-logo" />
+            <span>
+                <strong>Matibari</strong>
+                <small style="color:rgba(233,196,106,.85)">Admin workspace</small>
+            </span>
+        </a>
+        <div>
+            <span class="hero-badge">🛡️ Two-step admin access</span>
+            <h1 style="margin-top:1.35rem">Good food.<br /><span>Good business.</span></h1>
+            <p class="muted-light" style="max-width:26rem">
+                Password plus a one-time code keeps your store data — orders, sales and
+                customers — safe behind two locks.
+            </p>
+        </div>
+        <p style="color:rgba(244,237,216,.45);font-size:.78rem">Handcrafted | Natural | Traditional</p>
+    </section>
+
+    <section class="login-form">
+        <div class="login-card">
+            <a href="/" class="btn btn-ghost btn-sm" style="margin-bottom:2rem">← Back to store</a>
+
+            @if (!_step2)
+            {
+                <span class="kicker">Welcome back</span>
+                <h2 style="font-size:2.15rem;color:var(--green-800);margin-top:.55rem">Admin sign in</h2>
+                <p class="muted" style="font-size:.88rem">Step 1 of 2 · Enter your admin credentials.</p>
+
+                @if (!string.IsNullOrEmpty(_error))
+                {
+                    <div class="alert alert-error" style="margin-top:1.15rem">@_error</div>
+                }
+
+                <div style="margin-top:1.85rem">
+                    <label class="field">
+                        <span>Admin email</span>
+                        <input @bind="_email" type="email" placeholder="you&#64;matibari.in" />
+                    </label>
+                    <label class="field">
+                        <span>Password</span>
+                        <input @bind="_password" type="password" placeholder="Enter your password" />
+                    </label>
+                    <button class="btn btn-primary" style="width:100%" @onclick="SubmitCredentials">
+                        Continue with OTP →
+                    </button>
+                </div>
+
+                <div style="margin-top:2rem;background:var(--cream-2);border:1px solid rgba(233,196,106,.5);border-radius:1rem;padding:1.15rem">
+                    <strong style="font-size:.78rem">Preview environment</strong>
+                    <p class="muted" style="font-size:.72rem;margin:.45rem 0 0">
+                        Demo login: <b>saptarsree.b&#64;skykingindia.com</b> / <b>&#64;Saptarsee1998</b>.
+                        The OTP is shown on screen in preview.
+                    </p>
+                </div>
+            }
+            else
+            {
+                <span class="kicker">Step 2 of 2</span>
+                <h2 style="font-size:2.15rem;color:var(--green-800);margin-top:.55rem">Verify your code</h2>
+                <p class="muted" style="font-size:.88rem">
+                    We sent a 6-digit code to your admin email. Codes expire in 5 minutes.
+                </p>
+
+                @if (!string.IsNullOrEmpty(_error))
+                {
+                    <div class="alert alert-error" style="margin-top:1.15rem">@_error</div>
+                }
+
+                @if (!string.IsNullOrEmpty(Admin.DemoOtp))
+                {
+                    <div style="background:#f5ebcf;color:#7c5b1f;border-radius:.85rem;padding:.85rem 1.15rem;font-size:.76rem;margin-top:1.15rem">
+                        <b>Preview mode:</b> your demo code is
+                        <b style="font-family:monospace;font-size:1.05rem;letter-spacing:.22em">@Admin.DemoOtp</b>
+                    </div>
+                }
+
+                <div style="margin-top:1.35rem">
+                    <label class="field">
+                        <span>6-digit code</span>
+                        <input @bind="_code" inputmode="numeric" maxlength="6" placeholder="••••••"
+                               style="letter-spacing:.55em;font-size:1.55rem;font-weight:700;text-align:center;height:3.65rem" />
+                    </label>
+                    <button class="btn btn-primary" style="width:100%" @onclick="SubmitOtp">
+                        Verify &amp; open dashboard →
+                    </button>
+                    <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:.75rem" @onclick="BackToLogin">
+                        ← Use a different account
+                    </button>
+                </div>
+
+                <p class="muted" style="font-size:.72rem;margin-top:1.35rem">
+                    🔒 In production this code is delivered by SMS/email through your OTP provider
+                    (MSG91 / Twilio) and verified on the server.
+                </p>
+            }
+        </div>
+    </section>
+</div>
+
+@code {
+    private string _email = string.Empty;
+    private string _password = string.Empty;
+    private string _code = string.Empty;
+    private bool _step2;
+    private string? _error;
+
+    private async Task SubmitCredentials()
+    {
+        var (ok, error) = await Admin.VerifyCredentialsAsync(_email, _password);
+        if (!ok)
+        {
+            _error = error;
+            return;
+        }
+
+        _error = null;
+        _code = string.Empty;
+        _step2 = true;
+    }
+
+    private async Task SubmitOtp()
+    {
+        var (ok, error) = await Admin.VerifyOtpAsync(_code);
+        if (!ok)
+        {
+            _error = error;
+            return;
+        }
+
+        Nav.NavigateTo("/admin/dashboard");
+    }
+
+    private void BackToLogin()
+    {
+        _step2 = false;
+        _error = null;
+        _code = string.Empty;
+    }
+}

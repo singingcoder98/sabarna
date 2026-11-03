@@ -1,0 +1,108 @@
+@page "/admin/dashboard"
+@layout AdminLayout
+@inject AppDbContext Db
+@inject AdminState Admin
+@inject NavigationManager Nav
+
+<PageTitle>Dashboard | Matibari Admin</PageTitle>
+
+@if (!Admin.IsAuthenticated)
+{
+    <p class="muted">Redirecting to login…</p>
+}
+else
+{
+    <div class="admin-header">
+        <div>
+            <h1>Overview</h1>
+            <p class="muted" style="font-size:.85rem;margin:.35rem 0 0">
+                @DateTime.Now.ToString("dddd, dd MMMM yyyy") · Manage your organic store with care.
+            </p>
+        </div>
+        <a class="btn btn-primary btn-sm" href="/admin/orders">Review orders →</a>
+    </div>
+
+    <div class="stat-grid">
+        <div class="stat"><small>Gross revenue</small><strong>₹@_revenue.ToString("N0")</strong></div>
+        <div class="stat"><small>Orders placed</small><strong>@_totalOrders</strong></div>
+        <div class="stat"><small>Products (live / total)</small><strong>@_liveProducts / @_totalProducts</strong></div>
+        <div class="stat"><small>Low stock items</small><strong>@_lowStock.Count</strong></div>
+    </div>
+
+    <div class="grid grid-2" style="margin-top:1.5rem;align-items:start">
+        <div>
+            <h3 style="margin-bottom:1rem">Recent orders</h3>
+            <table class="table">
+                <thead>
+                    <tr><th>Order</th><th>Customer</th><th>Total</th><th>Payment</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in _recentOrders)
+                    {
+                        <tr>
+                            <td><strong>@order.OrderNumber</strong></td>
+                            <td>@order.Customer<br /><small class="muted">@order.Email</small></td>
+                            <td>₹@order.Total.ToString("N0")</td>
+                            <td><span class="pill pill-green">@order.Payment · @order.PaymentMethod</span></td>
+                            <td><span class="pill @StatusClass(order.Status)">@order.Status</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div>
+            <h3 style="margin-bottom:1rem">Low stock alerts</h3>
+            @if (!_lowStock.Any())
+            {
+                <div class="panel center"><p class="muted" style="margin:0">✅ All products are well stocked.</p></div>
+            }
+            else
+            {
+                <table class="table">
+                    <thead><tr><th>Product</th><th>Stock</th></tr></thead>
+                    <tbody>
+                        @foreach (var product in _lowStock)
+                        {
+                            <tr>
+                                <td>@product.Name</td>
+                                <td><span class="pill pill-red">@product.Stock units</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    private int _totalProducts, _liveProducts, _totalOrders;
+    private decimal _revenue;
+    private List<Order> _recentOrders = new();
+    private List<Product> _lowStock = new();
+
+    protected override void OnInitialized()
+    {
+        if (!Admin.IsAuthenticated)
+        {
+            Nav.NavigateTo("/admin/login");
+            return;
+        }
+
+        var orders = Db.Orders.AsNoTracking().OrderByDescending(o => o.CreatedAt).ToList();
+        _totalProducts = Db.Products.Count();
+        _liveProducts = Db.Products.Count(p => p.Active);
+        _totalOrders = orders.Count;
+        _revenue = orders.Where(o => o.Payment == "Paid").Sum(o => o.Total);
+        _recentOrders = orders.Take(8).ToList();
+        _lowStock = Db.Products.AsNoTracking().Where(p => p.Stock < 20).OrderBy(p => p.Stock).ToList();
+    }
+
+    private static string StatusClass(string status) => status switch
+    {
+        "Delivered" => "pill-grey",
+        "Shipped" => "pill-green",
+        _ => "pill-amber"
+    };
+}
