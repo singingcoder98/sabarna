@@ -7,87 +7,49 @@
     <div class="container" style="max-width:52rem">
         <span class="mb-kicker">Matibari · Legal</span>
         <h2 class="mb-title">Store Policies</h2>
-        <p class="mb-lead">Shipping, refunds, privacy and terms — everything simple and clear.</p>
+        <p class="mb-lead">
+            Everything simple and clear. Each policy has its own page so you can read it,
+            bookmark it or print it.
+        </p>
 
-        <div class="accordion mb-faq mt-4" id="policiesAccordion">
-            <div class="accordion-item" id="shipping">
-                <h3 class="accordion-header">
-                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#policyShipping"
-                            aria-expanded="true" aria-controls="policyShipping">
-                        🚚 Shipping policy
-                    </button>
-                </h3>
-                <div id="policyShipping" class="accordion-collapse collapse show" data-bs-parent="#policiesAccordion">
-                    <div class="accordion-body">
-                        <ul class="mb-0 ps-3">
-                            <li>Orders are dispatched within 24 working hours of successful payment.</li>
-                            <li>Delivery across India takes 2-4 working days, depending on location.</li>
-                            <li>Shipping is free on all orders above ₹999. Below ₹999, a flat ₹79 applies.</li>
-                            <li>Tracking details are sent on email and WhatsApp once shipped.</li>
-                            <li>We do not deliver outside India at the moment.</li>
-                        </ul>
-                    </div>
-                </div>
+        <div class="row row-cols-1 row-cols-md-2 g-3 mt-4">
+            <div class="col">
+                <a class="mb-policy-card" asp-controller="Home" asp-action="Shipping">
+                    <span class="mb-policy-icon">🚚</span>
+                    <h3>Shipping &amp; Returns</h3>
+                    <p>Delivery timelines, ₹79 flat shipping, free above ₹999, cancellations and replacements.</p>
+                    <span class="mb-policy-link">Read policy →</span>
+                </a>
             </div>
+            <div class="col">
+                <a class="mb-policy-card" asp-controller="Home" asp-action="Privacy">
+                    <span class="mb-policy-icon">🔒</span>
+                    <h3>Privacy Policy</h3>
+                    <p>What data we collect, how payments are handled, and what we will never do with it.</p>
+                    <span class="mb-policy-link">Read policy →</span>
+                </a>
+            </div>
+            <div class="col">
+                <a class="mb-policy-card" asp-controller="Home" asp-action="Terms">
+                    <span class="mb-policy-icon">📜</span>
+                    <h3>Terms &amp; Conditions</h3>
+                    <p>Pricing, prepaid-only payment, order confirmation and jurisdiction.</p>
+                    <span class="mb-policy-link">Read policy →</span>
+                </a>
+            </div>
+            <div class="col">
+                <a class="mb-policy-card" asp-controller="Contact" asp-action="Index">
+                    <span class="mb-policy-icon">💬</span>
+                    <h3>Questions?</h3>
+                    <p>Talk to a real person about an order, a return or a bulk enquiry.</p>
+                    <span class="mb-policy-link">Contact us →</span>
+                </a>
+            </div>
+        </div>
 
-            <div class="accordion-item" id="refund">
-                <h3 class="accordion-header">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#policyRefund" aria-expanded="false" aria-controls="policyRefund">
-                        🔄 Refund &amp; cancellation policy
-                    </button>
-                </h3>
-                <div id="policyRefund" class="accordion-collapse collapse" data-bs-parent="#policiesAccordion">
-                    <div class="accordion-body">
-                        <ul class="mb-0 ps-3">
-                            <li>Orders can be cancelled within 12 hours of placement for a full refund.</li>
-                            <li>Damaged, leaking or spoiled parcels: share a photo within 48 hours for a free replacement.</li>
-                            <li>Refunds are processed to the original payment method within 5-7 working days.</li>
-                            <li>Opened food items cannot be returned for hygiene reasons.</li>
-                            <li>Failed payments are auto-refunded by your bank within 3-5 working days.</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <div class="accordion-item" id="privacy">
-                <h3 class="accordion-header">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#policyPrivacy" aria-expanded="false" aria-controls="policyPrivacy">
-                        🔒 Privacy policy
-                    </button>
-                </h3>
-                <div id="policyPrivacy" class="accordion-collapse collapse" data-bs-parent="#policiesAccordion">
-                    <div class="accordion-body">
-                        <ul class="mb-0 ps-3">
-                            <li>We collect only what is needed to deliver your order: name, email, phone and address.</li>
-                            <li>Payments are handled securely by our payment gateway. We never store card or UPI details.</li>
-                            <li>We do not sell or share your personal data with any third party for marketing.</li>
-                            <li>To delete your data or ask a question, write to hello@matibari.in.</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <div class="accordion-item" id="terms">
-                <h3 class="accordion-header">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#policyTerms" aria-expanded="false" aria-controls="policyTerms">
-                        📜 Terms &amp; conditions
-                    </button>
-                </h3>
-                <div id="policyTerms" class="accordion-collapse collapse" data-bs-parent="#policiesAccordion">
-                    <div class="accordion-body">
-                        <ul class="mb-0 ps-3">
-                            <li>All products are 100% natural — colour, texture and taste may vary slightly between harvest batches.</li>
-                            <li>Prices are inclusive of applicable taxes and may change without prior notice.</li>
-                            <li>Product images are for representation; actual packaging may vary.</li>
-                            <li>Cash on Delivery is not available. All orders are prepaid (UPI, cards, net banking).</li>
-                            <li>Any dispute is subject to jurisdiction of courts at Indore, Madhya Pradesh.</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+        <div class="mb-pay-note mt-4" style="color:var(--mb-muted);border-color:rgba(47,62,36,.25);background:var(--mb-cream-2)">
+            <strong>In short:</strong> online payment only (no COD), dispatched in 24 working hours,
+            delivered in 2–4 working days, and damaged parcels replaced free within 48 hours.
         </div>
     </div>
 </section>

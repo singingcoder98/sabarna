@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /Admin
+Disallow: /Cart
+
+Sitemap: https://www.matibari.in/sitemap.xml

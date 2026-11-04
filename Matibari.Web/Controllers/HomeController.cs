@@ -42,6 +42,20 @@ public class HomeController : Controller
         return View();
     }
 
+    /* ------------------------------------------------------------------
+       Standalone informational pages. Each legal policy now has its own
+       URL (shareable, printable, and no collapsed-accordion deep links).
+       ------------------------------------------------------------------ */
+
+    public IActionResult About() => View();
+
+    public IActionResult Privacy() => View();
+
+    public IActionResult Terms() => View();
+
+    /// Shipping and returns live together — refunds are anchored at #refund.
+    public IActionResult Shipping() => View();
+
     [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     public IActionResult Error() => View();
 }

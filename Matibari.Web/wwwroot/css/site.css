@@ -1118,6 +1118,59 @@ a { text-underline-offset: 3px; }
 
 .mb-validation-validation-summary-errors li { margin-bottom: 0.2rem; }
 
+/* ------------------------------ new pages -------------------------------- */
+
+/* Product detail hero image */
+.mb-detail-media {
+  position: relative;
+  border-radius: 1.5rem;
+  overflow: hidden;
+  border: 1px solid var(--mb-line);
+  background: linear-gradient(135deg, #f7efdc, #e3cfa4);
+  box-shadow: var(--mb-shadow-lg);
+  aspect-ratio: 1 / 1;
+}
+
+.mb-detail-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Policy index cards */
+.mb-policy-card {
+  display: block;
+  height: 100%;
+  padding: 1.5rem;
+  border-radius: 1.25rem;
+  border: 1px solid var(--mb-line);
+  background: #fff;
+  box-shadow: var(--mb-shadow);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.mb-policy-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--mb-shadow-lg);
+  border-color: rgba(181, 88, 44, 0.4);
+  color: inherit;
+}
+
+.mb-policy-icon { font-size: 1.6rem; line-height: 1; display: block; margin-bottom: 0.75rem; }
+.mb-policy-card h3 { font-size: 1.05rem; margin-bottom: 0.4rem; }
+.mb-policy-card p { font-size: 0.84rem; color: var(--mb-muted); margin-bottom: 0.85rem; }
+
+.mb-policy-link {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--mb-terra);
+}
+
+.mb-contact-info .mb-footer-links li { font-size: 0.88rem; }
+
 /* -------------------------------- helpers -------------------------------- */
 
 /* Lets forms inside an .input-group behave like direct children. */

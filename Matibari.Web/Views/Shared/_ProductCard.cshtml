@@ -4,7 +4,8 @@
 }
 <div class="col">
     <article class="mb-card d-flex flex-column reveal">
-        <div class="mb-card-media">
+        <a class="mb-card-media d-block" asp-controller="Shop" asp-action="Details" asp-route-id="@Model.Id"
+           aria-label="View details for @Model.Name">
             @if (Model.HasImage)
             {
                 <img src="@Model.Image" alt="@Model.Name" loading="lazy" />
@@ -24,11 +25,14 @@
             {
                 <span class="mb-tag">@Model.Tag</span>
             }
-        </div>
+        </a>
 
         <div class="p-3 d-flex flex-column flex-grow-1">
             <div class="mb-stars mb-1">★★★★★ <small>(@Model.Reviews)</small></div>
-            <h3 class="mb-card-title">@Model.Name</h3>
+            <h3 class="mb-card-title">
+                <a asp-controller="Shop" asp-action="Details" asp-route-id="@Model.Id"
+                   class="text-decoration-none">@Model.Name</a>
+            </h3>
             <p class="text-secondary mb-2" style="font-size:.76rem">@Model.Unit</p>
             <p class="mb-card-desc">@Model.Description</p>
 

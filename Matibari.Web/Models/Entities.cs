@@ -234,3 +234,21 @@ public class OtpViewModel
 
     public string? DemoOtp { get; set; }
 }
+
+public class ContactViewModel
+{
+    [Required, StringLength(120)]
+    public string Name { get; set; } = string.Empty;
+
+    [Required, EmailAddress, StringLength(160)]
+    public string Email { get; set; } = string.Empty;
+
+    [StringLength(40)]
+    public string Phone { get; set; } = string.Empty;
+
+    [Required, StringLength(120)]
+    public string Subject { get; set; } = string.Empty;
+
+    [Required, StringLength(2000, MinimumLength = 10)]
+    public string Message { get; set; } = string.Empty;
+}

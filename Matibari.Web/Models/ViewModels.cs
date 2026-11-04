@@ -30,3 +30,12 @@ public class AdminDashboardViewModel
     public List<Order> RecentOrders { get; set; } = new();
     public List<Product> LowStock { get; set; } = new();
 }
+
+public class ProductDetailsViewModel
+{
+    public Product Product { get; set; } = new();
+    public SiteSetting Setting { get; set; } = new();
+
+    /// Other products from the same category, shown as "You may also like".
+    public List<Product> Related { get; set; } = new();
+}

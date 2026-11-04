@@ -26,12 +26,13 @@ public class CartController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Add(int id, string? returnUrl)
+    public async Task<IActionResult> Add(int id, string? returnUrl, int qty = 1)
     {
         var product = await _db.Products.FirstOrDefaultAsync(p => p.Id == id && p.Active);
         if (product is not null && product.Stock > 0)
         {
-            _cart.Add(product);
+            // Quantity comes from the product detail page; clamped to a sane range.
+            _cart.Add(product, Math.Clamp(qty, 1, 20));
             TempData["Toast"] = $"{product.Name} added to your basket";
         }
 
@@ -54,6 +55,21 @@ public class CartController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    /// Dedicated checkout step — reached from the basket.
+    [HttpGet]
+    public IActionResult Checkout()
+    {
+        var lines = _cart.GetLines();
+        if (lines.Count == 0)
+        {
+            TempData["Error"] = "Your basket is empty — add something first.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        ViewBag.Setting = _db.SiteSettings.FirstOrDefault() ?? new SiteSetting();
+        return View(new CheckoutViewModel { Lines = lines });
+    }
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Checkout(CheckoutViewModel model)
@@ -70,7 +86,7 @@ public class CartController : Controller
         if (!ModelState.IsValid)
         {
             ViewBag.Setting = _db.SiteSettings.FirstOrDefault() ?? new SiteSetting();
-            return View(nameof(Index), model);
+            return View(model);
         }
 
         // Online payments only - Cash on Delivery is disabled.
@@ -79,7 +95,7 @@ public class CartController : Controller
         {
             ModelState.AddModelError(nameof(model.PaymentMethod), "Only online payment is available.");
             ViewBag.Setting = _db.SiteSettings.FirstOrDefault() ?? new SiteSetting();
-            return View(nameof(Index), model);
+            return View(model);
         }
 
         var first = lines.First();

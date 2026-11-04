@@ -1,0 +1,108 @@
+@model ContactViewModel
+@{
+    ViewData["Title"] = "Contact Us | Matibari";
+    ViewData["Description"] = "Questions about an order, bulk buying or wholesale? Talk to the Matibari team by form, phone, email or WhatsApp.";
+    var setting = ViewBag.Setting as SiteSetting ?? new SiteSetting();
+}
+
+<section class="mb-section">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="mb-kicker">Contact us</span>
+            <h2 class="mb-title">We'd Love to Hear From You</h2>
+            <p class="mb-lead mb-lead-center">
+                Questions about an order, bulk buying or a wholesale enquiry — send a message
+                and a real person from the farm team will reply.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="mb-panel">
+                    <h3 class="h5 mb-3">Send us a message</h3>
+
+                    <form asp-controller="Contact" asp-action="Index" method="post">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="mb-validation"></div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="Name" class="form-label">Your name</label>
+                                <input asp-for="Name" class="form-control" placeholder="Full name" required />
+                                <span asp-validation-for="Name" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Email" class="form-label">Email</label>
+                                <input asp-for="Email" type="email" class="form-control" placeholder="you@example.com" required />
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Phone" class="form-label">Phone (optional)</label>
+                                <input asp-for="Phone" class="form-control" placeholder="+91 98765 43210" />
+                                <span asp-validation-for="Phone" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Subject" class="form-label">Subject</label>
+                                <input asp-for="Subject" class="form-control" placeholder="Order, bulk enquiry, feedback…" required />
+                                <span asp-validation-for="Subject" class="text-danger small"></span>
+                            </div>
+                            <div class="col-12">
+                                <label asp-for="Message" class="form-label">Message</label>
+                                <textarea asp-for="Message" rows="5" class="form-control"
+                                          placeholder="Tell us what you need — order number helps if you have one." required></textarea>
+                                <span asp-validation-for="Message" class="text-danger small"></span>
+                            </div>
+                            <div class="col-12">
+                                <button class="btn btn-brand" type="submit">Send message →</button>
+                                <span class="text-secondary ms-2" style="font-size:.75rem">
+                                    We reply within one working day (Mon–Sat, 9am–8pm IST).
+                                </span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="mb-panel mb-contact-info">
+                    <h3 class="h5 mb-3">Reach us directly</h3>
+                    <ul class="list-unstyled mb-footer-links mb-0" style="color:var(--mb-ink)">
+                        <li>
+                            <strong>📍 Visit</strong><br />
+                            <span class="text-secondary">@setting.Address</span>
+                        </li>
+                        <li class="mt-3">
+                            <strong>📞 Call</strong><br />
+                            <a href="tel:@setting.Phone" class="text-secondary">@setting.Phone</a>
+                        </li>
+                        <li class="mt-3">
+                            <strong>✉️ Email</strong><br />
+                            <a href="mailto:@setting.Email" class="text-secondary">@setting.Email</a>
+                        </li>
+                        <li class="mt-3">
+                            <strong>🕒 Hours</strong><br />
+                            <span class="text-secondary">Monday–Saturday, 9:00–20:00 IST</span>
+                        </li>
+                    </ul>
+
+                    <hr class="mb-footer-rule" style="border-color:var(--mb-line);margin-block:1.5rem" />
+
+                    <a class="btn btn-brand w-100"
+                       href="https://wa.me/@setting.Whatsapp?text=Hello%20@Uri.EscapeDataString(setting.BrandName)%2C%20I%20have%20a%20question."
+                       target="_blank" rel="noopener">
+                        💬 Chat on WhatsApp
+                    </a>
+                    <p class="text-secondary mt-2 mb-0" style="font-size:.72rem">
+                        Fastest for order updates — our team is usually online during store hours.
+                    </p>
+                </div>
+
+                <div class="mb-pay-note mt-3" style="color:var(--mb-muted);border-color:rgba(181,88,44,.35);background:rgba(181,88,44,.06)">
+                    For damaged or missing items, please use the
+                    <a asp-controller="Home" asp-action="Shipping">shipping &amp; returns policy</a>
+                    so we can replace your parcel quickly.
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,57 @@
+@{
+    ViewData["Title"] = "Terms & Conditions | Matibari";
+    ViewData["Description"] = "The terms that apply when you order from Matibari — pricing, payment, delivery and jurisdiction.";
+}
+
+<section class="mb-section">
+    <div class="container" style="max-width:52rem">
+        <span class="mb-kicker">Matibari · Legal</span>
+        <h2 class="mb-title">Terms &amp; Conditions</h2>
+        <p class="mb-lead">The plain-language rules that apply every time you place an order with us.</p>
+        <p class="text-secondary" style="font-size:.78rem">Last updated: November 2026</p>
+
+        <div class="mb-panel mt-4">
+            <h3 class="h5">1. Products</h3>
+            <ul class="mb-0 ps-3" style="color:var(--mb-muted)">
+                <li>Everything we sell is a natural, small-batch product — colour, texture and taste may vary slightly between harvests.</li>
+                <li>Product images are representative; actual packaging may differ.</li>
+                <li>Nutritional and ingredient details are listed on each product page.</li>
+            </ul>
+        </div>
+
+        <div class="mb-panel mt-3">
+            <h3 class="h5">2. Pricing and payment</h3>
+            <ul class="mb-0 ps-3" style="color:var(--mb-muted)">
+                <li>All prices are in Indian Rupees and inclusive of applicable taxes.</li>
+                <li>Prices may change without prior notice; the price at checkout is the price you pay.</li>
+                <li><strong>Cash on Delivery is not available.</strong> All orders are prepaid via UPI, card or netbanking.</li>
+                <li>If a payment fails, your bank releases the hold automatically within 3–5 working days.</li>
+            </ul>
+        </div>
+
+        <div class="mb-panel mt-3">
+            <h3 class="h5">3. Orders and delivery</h3>
+            <ul class="mb-0 ps-3" style="color:var(--mb-muted)">
+                <li>An order is confirmed once payment succeeds — you will receive a confirmation by email.</li>
+                <li>We dispatch within 24 working hours and deliver pan-India in 2–4 working days.</li>
+                <li>Delivery timelines can slip during festivals, strikes or extreme weather; we will keep you informed.</li>
+                <li>See the <a asp-controller="Home" asp-action="Shipping">shipping &amp; returns policy</a> for the full details.</li>
+            </ul>
+        </div>
+
+        <div class="mb-panel mt-3">
+            <h3 class="h5">4. Liability and jurisdiction</h3>
+            <ul class="mb-0 ps-3" style="color:var(--mb-muted)">
+                <li>Our liability for any order is limited to the value of that order.</li>
+                <li>We are not responsible for delays caused by events outside our control.</li>
+                <li>These terms are governed by Indian law; disputes fall under the jurisdiction of the courts at Indore, Madhya Pradesh.</li>
+                <li>We may update these terms — the version published here applies to your order.</li>
+            </ul>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2 mt-4">
+            <a class="btn btn-ghost" asp-controller="Home" asp-action="Policies">← All policies</a>
+            <a class="btn btn-brand" asp-controller="Contact" asp-action="Index">Questions? Contact us</a>
+        </div>
+    </div>
+</section>

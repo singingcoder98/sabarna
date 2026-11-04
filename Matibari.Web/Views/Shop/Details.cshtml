@@ -1,0 +1,159 @@
+@model ProductDetailsViewModel
+@{
+    var product = Model.Product;
+    ViewData["Title"] = $"{product.Name} — Buy Online | {Model.Setting.BrandName}";
+    ViewData["Description"] = product.Description;
+    var returnUrl = $"/Shop/Details/{product.Id}";
+    ViewData["ReturnUrl"] = returnUrl;
+
+    var saved = product.Mrp > product.Price ? product.Mrp - product.Price : 0;
+    var percent = product.Mrp > 0 ? (int)Math.Round((double)(saved / product.Mrp * 100)) : 0;
+    var comboItems = product.IsCombo ? CartService.GetComboItems(product) : new List<ComboItemDto>();
+}
+
+<section class="mb-section">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-4" style="font-size:.82rem">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item"><a asp-controller="Shop" asp-action="Index">Shop</a></li>
+                <li class="breadcrumb-item">
+                    <a asp-controller="Shop" asp-action="Index" asp-route-category="@product.Category">@product.Category</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">@product.Name</li>
+            </ol>
+        </nav>
+
+        <div class="row g-5">
+            <div class="col-lg-6">
+                <div class="mb-detail-media">
+                    @if (product.HasImage)
+                    {
+                        <img src="@product.Image" alt="@product.Name" />
+                    }
+                    else
+                    {
+                        <div class="mb-card-placeholder" role="img" aria-label="@product.Name">
+                            <svg viewBox="0 0 120 120" aria-hidden="true">
+                                <circle cx="60" cy="62" r="34" fill="#fff" opacity="0.55"></circle>
+                                <path d="M60 34c12 6 18 16 18 27 0 12-8 21-18 25-10-4-18-13-18-25 0-11 6-21 18-27z" fill="#7a9b5f" opacity="0.85"></path>
+                                <path d="M60 36v48" stroke="#3f5a2e" stroke-width="2.5" stroke-linecap="round"></path>
+                                <path d="M34 92h52" stroke="#b5582c" stroke-width="4" stroke-linecap="round"></path>
+                            </svg>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(product.Tag))
+                    {
+                        <span class="mb-tag">@product.Tag</span>
+                    }
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    <span class="mb-kicker mb-0">@product.Category</span>
+                    @if (product.IsCombo)
+                    {
+                        <span class="mb-combo-badge" style="background:rgba(181,88,44,.12);color:var(--mb-terra);border-color:rgba(181,88,44,.3)">
+                            ✨ Special combo
+                        </span>
+                    }
+                </div>
+
+                <h1 class="mb-title" style="font-size:clamp(1.6rem,3vw,2.3rem)">@product.Name</h1>
+
+                <div class="d-flex flex-wrap align-items-center gap-3 mb-3">
+                    <span class="mb-stars">★★★★★ <small>(@product.Reviews reviews)</small></span>
+                    <span class="text-secondary" style="font-size:.82rem">@product.Rating.ToString("0.0") / 5</span>
+                    @if (product.Stock > 0)
+                    {
+                        <span class="mb-pill mb-pill-green">In stock — @product.Stock left</span>
+                    }
+                    else
+                    {
+                        <span class="mb-pill mb-pill-red">Sold out</span>
+                    }
+                </div>
+
+                <div class="d-flex align-items-end gap-2 mb-1">
+                    <span class="mb-price" style="font-size:2rem">₹@product.Price</span>
+                    @if (product.Mrp > product.Price)
+                    {
+                        <span class="mb-price-old" style="font-size:1rem">₹@product.Mrp</span>
+                        <span class="mb-combo-save">Save ₹@saved · @percent% off</span>
+                    }
+                </div>
+                <p class="text-secondary" style="font-size:.82rem">@product.Unit · inclusive of all taxes</p>
+
+                <p class="mb-lead">@product.Description</p>
+
+                @if (comboItems.Any())
+                {
+                    <p class="mb-combo-label" style="color:var(--mb-terra)">What's inside this combo</p>
+                    <div class="mb-combo-includes mb-4">
+                        @foreach (var item in comboItems)
+                        {
+                            <span class="mb-combo-include" style="background:var(--mb-cream-2);border-color:var(--mb-line);color:var(--mb-ink)">
+                                @if (!string.IsNullOrEmpty(item.Image))
+                                {
+                                    <img src="@item.Image" alt="@item.Name" loading="lazy" />
+                                }
+                                else
+                                {
+                                    <span class="mb-thumb-ph" aria-hidden="true"></span>
+                                }
+                                @item.Name@(item.Qty > 1 ? $" ×{item.Qty}" : "")
+                            </span>
+                        }
+                    </div>
+                }
+
+                <form asp-controller="Cart" asp-action="Add" method="post" class="row g-2 align-items-center mt-4">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@product.Id" />
+                    <input type="hidden" name="returnUrl" value="@returnUrl" />
+
+                    <div class="col-auto">
+                        <label class="form-label mb-0" for="qty">Qty</label>
+                    </div>
+                    <div class="col-auto">
+                        <input id="qty" name="qty" type="number" class="form-control" value="1"
+                               min="1" max="20" style="width:5.5rem" @(product.Stock <= 0 ? "disabled" : null) />
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn btn-brand" type="submit" @(product.Stock <= 0 ? "disabled" : null)>
+                            @(product.Stock <= 0 ? "Sold out" : "🛒 Add to basket")
+                        </button>
+                    </div>
+                    <div class="col-auto">
+                        <a class="btn btn-ghost" asp-controller="Cart" asp-action="Index">Go to basket →</a>
+                    </div>
+                </form>
+
+                <div class="row row-cols-1 row-cols-sm-3 g-2 mt-4">
+                    <div class="col"><div class="mb-value"><h4>🚚 Free shipping</h4><p>On orders above ₹999</p></div></div>
+                    <div class="col"><div class="mb-value"><h4>🔒 Online payment</h4><p>UPI · cards · netbanking</p></div></div>
+                    <div class="col"><div class="mb-value"><h4>↩️ Easy returns</h4><p>Damaged parcel replaced</p></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@if (Model.Related.Any())
+{
+    <section class="mb-section mb-section-alt">
+        <div class="container">
+            <div class="text-center mb-5">
+                <span class="mb-kicker">You may also like</span>
+                <h2 class="mb-title">More from the @product.Category shelf</h2>
+            </div>
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+                @foreach (var related in Model.Related)
+                {
+                    <partial name="_ProductCard" model="related" />
+                }
+            </div>
+        </div>
+    </section>
+}

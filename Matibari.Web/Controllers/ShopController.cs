@@ -36,6 +36,31 @@ public class ShopController : Controller
         return View(model);
     }
 
+    /// Product detail page — full description, gallery, add-to-cart and related items.
+    public async Task<IActionResult> Details(int id)
+    {
+        var product = await _db.Products.FirstOrDefaultAsync(p => p.Id == id && p.Active);
+        if (product is null)
+        {
+            return NotFound();
+        }
+
+        var related = await _db.Products
+            .Where(p => p.Active && p.Id != product.Id && (p.Category == product.Category || p.IsCombo == product.IsCombo))
+            .OrderBy(p => p.Id)
+            .Take(3)
+            .ToListAsync();
+
+        var model = new ProductDetailsViewModel
+        {
+            Product = product,
+            Related = related,
+            Setting = await _db.SiteSettings.FirstOrDefaultAsync() ?? new SiteSetting()
+        };
+
+        return View(model);
+    }
+
     /// Premium "Special Combos" listing.
     public async Task<IActionResult> Combos()
     {
